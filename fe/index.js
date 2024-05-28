@@ -14,19 +14,9 @@ async function fetchMessage() {
   }
 }
 
-async function fetchIcons() {
-  try {
-    const response = await fetch('http://localhost:3000/api/icons');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json(); // Parse JSON
-    console.log('Empfangene Daten:', data);
-    displayIcons(data.svg); // Pass the SVG data to displayIcons
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Daten:', error);
-  }
-}
+let svgIcon = ''; // Variable zum Speichern des SVG-Icons
+
+
 
 function displayIcons(svgData) {
   const iconList = document.getElementById('icon');
@@ -42,12 +32,12 @@ function displayIcons(svgData) {
 
 async function start() {
   await fetchMessage();
-  await fetchIcons();
 }
+
 
 let toDoText = '';
 
-function addToDo(event) {
+async function addToDo(event) {
   event.preventDefault(); // Verhindert das Standardverhalten des Formulars (Seiten-Reload)
   
   const toDoField = document.getElementById('ToDoField');
@@ -56,25 +46,38 @@ function addToDo(event) {
   if (toDoText === '') {
     return; // Leere Einträge ignorieren
   }
+  putKeyword(toDoText);
   
+//----------------------------------------------------
+
   const toDoList = document.getElementById('toDoListe');
 
   // Neues Listenelement erstellen
   const listItem = document.createElement('li');
+  listItem.className = 'mdl-list__item todo-item';
 
-  listItem.className = 'mdl-list__item';
-  
-  listItem.innerHTML = `
-    <span class="mdl-list__item-primary-content">
-      <i class="material-icons mdl-list__item-avatar">label</i>
-      ${toDoText}
-    </span>
-    <span class="mdl-list__item-secondary-action">
-      <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="list-checkbox-${toDoList.children.length}">
-        <input type="checkbox" id="list-checkbox-${toDoList.children.length}" class="mdl-checkbox__input" />
-      </label>
-    </span>
+  // Span für den Textinhalt erstellen
+  const textSpan = document.createElement('span');
+  textSpan.className = 'mdl-list__item-primary-content';
+  textSpan.textContent = toDoText;
+
+  // Hier wird das SVG-Icon in das div-Element mit einer eindeutigen ID eingefügt
+  const iconContainer = document.createElement('div');
+  iconContainer.id = `icon-${toDoList.children.length}`; // Eindeutige ID für jedes Icon-Div
+  iconContainer.innerHTML = svgIcon; 
+
+  // Checkbox erstellen
+  const checkboxLabel = document.createElement('label');
+  checkboxLabel.className = 'mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-list__item-secondary-action';
+  checkboxLabel.htmlFor = `list-checkbox-${toDoList.children.length}`;
+  checkboxLabel.innerHTML = `
+    <input type="checkbox" id="list-checkbox-${toDoList.children.length}" class="mdl-checkbox__input" />
   `;
+
+  // Listenelement zusammensetzen
+  listItem.appendChild(textSpan);
+  listItem.appendChild(iconContainer); // Icon-Container hinzufügen
+  listItem.appendChild(checkboxLabel);
 
   // Listenelement zur ToDo-Liste hinzufügen
   toDoList.appendChild(listItem);
@@ -85,27 +88,22 @@ function addToDo(event) {
   // Eingabefeld zurücksetzen
   toDoField.value = ''; 
 
-  putKeyword(toDoText);
-
 }
+
 
 async function putKeyword(toDoText) {
   try {
-    const response = await fetch('http://localhost:3000/api/icons', {
+    const response = await fetch('http://localhost:3000/api/keyword', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ keyword: toDoText }) // Send toDoText to the server
+      body: JSON.stringify({ keyword: toDoText })
     });
 
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
-    const data = await response.json(); // Parse JSON
-    console.log('Empfangene Daten:', data);
-    displayIcons(data.svg); // Display new SVG data if required
   } catch (error) {
     console.error('Fehler beim Senden des Keywords:', error);
   }

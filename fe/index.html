@@ -20,7 +20,6 @@
 <body>
   <p id="message"></p>
   <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
-
   <!-- Always shows a header, even in smaller screens. -->
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
@@ -54,13 +53,17 @@
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="ToDoField">
             <label class="mdl-textfield__label" for="ToDoField">New ...</label>
+            <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
           </div>
           <!-- Raised button -->
           <button type="submit" class="mdl-button mdl-js-button mdl-button--raised">
             ADD
           </button>
         </form>
-        <ul class="demo-list-control mdl-list" id="toDoListe"></ul>
+        <ul class="demo-list-control mdl-list" id="toDoListe">
+          <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
+        </div>
+        </ul>
       </div>
     </main>
   </div>

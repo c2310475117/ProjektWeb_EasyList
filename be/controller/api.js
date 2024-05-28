@@ -68,4 +68,23 @@ async function getIconDatafromAPI(keyword) {
     }
 }
 
+// Importieren des Icon-Modells
+import Item from '../models/itemModel.js';
+/*
+async function putKeyword(toDoText) {
+  try {
+    // Hier wird das Icon abgerufen
+    const sendIconData = await getIconDatafromAPI(keyword);
+
+    // Hier wird das Icon in die Datenbank gespeichert
+    const savedIcon = await Icon.create({ keyword: toDoText, svg: sendIconData });
+
+    // Das gespeicherte Icon wird an das Frontend zurückgesendet
+    res.json({ svg: savedIcon.svg });
+  } catch (error) {
+    console.error('Fehler beim Senden des Keywords:', error);
+    res.status(500).send('Interner Serverfehler');
+  }
+}*/
+
 export { getIconDatafromAPI };
