@@ -1,5 +1,11 @@
 //!-- frontend/index.js -->
 
+let svgIcon = ''; // Variable zum Speichern des SVG-Icons
+let toDoText = '';
+
+async function start() {
+  await fetchMessage();
+}
 
 async function fetchMessage() {
   try {
@@ -14,9 +20,44 @@ async function fetchMessage() {
   }
 }
 
-let svgIcon = ''; // Variable zum Speichern des SVG-Icons
+async function fetchItems() {
+  try {
+    const response = await fetch('http://localhost:3000/items');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    data.forEach(item => displayItemInList(item));
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Daten:', error);
+  }
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+  fetchItems();
+});
 
+function displayItemInList(item) {
+  // Zuerst ein Listenelement erstellen
+  const listItem = document.createElement('li');
+
+  // Den Inhalt des Items in das Listenelement einfügen
+  listItem.innerHTML = `
+    <div>ID: ${item.id}</div>
+    <div>Title (English): ${item.title_en}</div>
+    <div>Title (German): ${item.title_de}</div>
+    <div>Icon: ${item.icon}</div>
+  `;
+
+  // SVG-Icon einfügen
+  const iconContainer = document.createElement('div');
+  iconContainer.innerHTML = item.icon; // Hier setzen wir den SVG-Code ein
+  listItem.appendChild(iconContainer);
+
+  // Das Listenelement zur Liste hinzufügen
+  const itemList = document.getElementById('toDoListe');
+  itemList.appendChild(listItem);
+}
 
 function displayIcons(svgData) {
   const iconList = document.getElementById('icon');
@@ -30,70 +71,10 @@ function displayIcons(svgData) {
   }
 }
 
-async function start() {
-  await fetchMessage();
-}
-
-
-let toDoText = '';
-
-async function addToDo(event) {
-  event.preventDefault(); // Verhindert das Standardverhalten des Formulars (Seiten-Reload)
-  
-  const toDoField = document.getElementById('ToDoField');
-  const toDoText = toDoField.value.trim();
-  
-  if (toDoText === '') {
-    return; // Leere Einträge ignorieren
-  }
-  putKeyword(toDoText);
-  
-//----------------------------------------------------
-
-  const toDoList = document.getElementById('toDoListe');
-
-  // Neues Listenelement erstellen
-  const listItem = document.createElement('li');
-  listItem.className = 'mdl-list__item todo-item';
-
-  // Span für den Textinhalt erstellen
-  const textSpan = document.createElement('span');
-  textSpan.className = 'mdl-list__item-primary-content';
-  textSpan.textContent = toDoText;
-
-  // Hier wird das SVG-Icon in das div-Element mit einer eindeutigen ID eingefügt
-  const iconContainer = document.createElement('div');
-  iconContainer.id = `icon-${toDoList.children.length}`; // Eindeutige ID für jedes Icon-Div
-  iconContainer.innerHTML = svgIcon; 
-
-  // Checkbox erstellen
-  const checkboxLabel = document.createElement('label');
-  checkboxLabel.className = 'mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-list__item-secondary-action';
-  checkboxLabel.htmlFor = `list-checkbox-${toDoList.children.length}`;
-  checkboxLabel.innerHTML = `
-    <input type="checkbox" id="list-checkbox-${toDoList.children.length}" class="mdl-checkbox__input" />
-  `;
-
-  // Listenelement zusammensetzen
-  listItem.appendChild(textSpan);
-  listItem.appendChild(iconContainer); // Icon-Container hinzufügen
-  listItem.appendChild(checkboxLabel);
-
-  // Listenelement zur ToDo-Liste hinzufügen
-  toDoList.appendChild(listItem);
-
-  // Material Design Lite neu initialisieren, damit die neuen Elemente richtig gerendert werden
-  componentHandler.upgradeElement(listItem);
-
-  // Eingabefeld zurücksetzen
-  toDoField.value = ''; 
-
-}
-
 
 async function putKeyword(toDoText) {
   try {
-    const response = await fetch('http://localhost:3000/api/keyword', {
+    const response = await fetch('http://localhost:3000/items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -109,8 +90,6 @@ async function putKeyword(toDoText) {
   }
 }
 
-
-
-document.addEventListener('DOMContentLoaded', start);
-document.querySelector('form').addEventListener('submit', addToDo);
-document.querySelector('button[type="submit"]').addEventListener('click', addToDo);
+document.addEventListener('DOMContentLoaded', () => {
+  start(); // Ruft start auf, um Nachrichten zu laden
+});

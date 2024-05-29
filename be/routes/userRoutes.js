@@ -1,9 +1,10 @@
 //!-- backend/routes/userRoutes.js -->
 
 
-const express = require('express');
+import express from 'express';
+import userController from '../controllers/userController.js'; // Stelle sicher, dass die Dateiendung ".js" angegeben ist
+
 const router = express.Router();
-const userController = require('../controllers/userController');
 
 // Route zum Erstellen eines neuen Benutzers
 router.post('/users', userController.createUser);
@@ -11,4 +12,4 @@ router.post('/users', userController.createUser);
 // Route zum Abrufen aller Benutzer
 router.get('/users', userController.getUsers);
 
-export default  router;
+export default router;

@@ -19,7 +19,7 @@
 </head>
 <body>
   <p id="message"></p>
-  <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
+  <div id="icon-container"></div> <!-- Hier werden die SVG-Icons eingefügt -->
   <!-- Always shows a header, even in smaller screens. -->
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <header class="mdl-layout__header">
@@ -53,7 +53,7 @@
           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
             <input class="mdl-textfield__input" type="text" id="ToDoField">
             <label class="mdl-textfield__label" for="ToDoField">New ...</label>
-            <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
+            <div id="icon-list"></div> <!-- Hier werden die SVG-Icons eingefügt -->
           </div>
           <!-- Raised button -->
           <button type="submit" class="mdl-button mdl-js-button mdl-button--raised">
@@ -61,8 +61,6 @@
           </button>
         </form>
         <ul class="demo-list-control mdl-list" id="toDoListe">
-          <div id="icon"></div> <!-- Hier wird das SVG eingefügt -->
-        </div>
         </ul>
       </div>
     </main>
