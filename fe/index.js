@@ -34,19 +34,20 @@ async function fetchItems() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  fetchMessage();
   fetchItems();
+  
 });
 
 function displayItemInList(item) {
   // Zuerst ein Listenelement erstellen
   const listItem = document.createElement('li');
 
+  
   // Den Inhalt des Items in das Listenelement einfügen
   listItem.innerHTML = `
-    <div>ID: ${item.id}</div>
-    <div>Title (English): ${item.title_en}</div>
-    <div>Title (German): ${item.title_de}</div>
-    <div>Icon: ${item.icon}</div>
+    <div>Title_en: ${item.title_en}</div>
+    <div>Title_de: ${item.title_de}</div>
   `;
 
   // SVG-Icon einfügen
@@ -90,6 +91,21 @@ async function putKeyword(toDoText) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  start(); // Ruft start auf, um Nachrichten zu laden
-});
+async function addToDo(event) {
+  event.preventDefault(); // Verhindert das Standardverhalten des Formulars (Seiten-Reload)
+  
+  const toDoField = document.getElementById('ToDoField');
+  const toDoText = toDoField.value.trim();
+  
+  if (toDoText === '') {
+    return; // Leere Einträge ignorieren
+  }
+
+  await putKeyword(toDoText);
+
+  toDoField.value = ''; // Eingabefeld zurücksetzen
+}
+
+
+document.addEventListener('DOMContentLoaded', start);
+document.querySelector('form').addEventListener('submit', addToDo);
