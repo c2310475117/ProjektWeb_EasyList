@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import itemRoutes from './routes/itemRoutes.js';
+import medRoutes from './routes/medRoutes.js'
 
 import Sequ from './db.js';
 
@@ -21,23 +22,39 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../fe')));
 
-// Routen für die ToDo-Elemente
-app.use('/items', itemRoutes);
 
-
-// POST-Endpunkt für die Weiterleitung von Anfragen an itemRoutes
 app.post('/items', (req, res) => {
   itemRoutes(req, res);
 });
 
-// GET-Endpunkt für die Weiterleitung von der Datenbank an Frontend
 app.get('/items', (req, res) => {
   itemRoutes(req, res);
+});
+
+app.delete ('/items/:id', (req, res) => {
+  itemRoutes(req, res);
+});
+
+app.post('/med', (req, res) => {
+  medRoutes(req, res);
+});
+
+app.get('/med', (req, res) => {
+  medRoutes(req, res);
+});
+
+app.get('/compare/:newMedId', (req, res) => {
+  medRoutes(req, res);
+});
+
+app.delete ('/med/:id', (req, res) => {
+  medRoutes(req, res);
 });
 
 app.get('/api/message', (req, res) => {
   res.json({ message: 'HELLO!' });
 });
+
 
 app.listen(port, () => {
   console.log(`Server läuft auf http://localhost:${port}`);

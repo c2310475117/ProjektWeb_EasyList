@@ -7,7 +7,7 @@ import { getIconDatafromAPI } from '../controller/IconApi.js';
 const router = express.Router();
 
 // Erstellen eines neuen Items
-router.post('/items', async (req, res) => {
+router.post('/', async (req, res) => {
     const { keyword } = req.body;
     if (!keyword) {
       return res.status(400).send('Keyword is required');
@@ -22,9 +22,9 @@ router.post('/items', async (req, res) => {
       console.log('Erhaltene Icon-Daten:', iconData);
   
       const newItem = await Item.create({ icon: iconData, title_en: keyword, title_de: keyword });
-      console.log('Erstelltes Item:', newItem);
   
-      res.status(200).send('Keyword und Icon erfolgreich verarbeitet');
+      // Erfolgreiche Antwort mit dem erstellten Item zurückgeben
+      res.status(201).json(newItem);
     } catch (error) {
       console.error('Fehler beim Verarbeiten des Keywords und Icons:', error);
       res.status(500).send('Interner Serverfehler');
@@ -33,7 +33,7 @@ router.post('/items', async (req, res) => {
   
 
 // Route zum Abrufen aller Items
-router.get('/items', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         // Alle Items aus der Datenbank abrufen
         const items = await Item.findAll();
@@ -54,7 +54,7 @@ router.get('/items', async (req, res) => {
 });
 
 // Abrufen eines Items nach ID
-router.get('/items/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const item = await Item.findByPk(req.params.id);
         if (item) {
@@ -68,7 +68,7 @@ router.get('/items/:id', async (req, res) => {
 });
 
 // Aktualisieren eines Items
-router.put('/items/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const { icon } = req.body;
         const [updated] = await Item.update({ icon }, {
@@ -86,7 +86,7 @@ router.put('/items/:id', async (req, res) => {
 });
 
 // Löschen eines Items
-router.delete('/items/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const deleted = await Item.destroy({
             where: { id: req.params.id }

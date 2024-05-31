@@ -6,3 +6,23 @@ body {
 h1 {
   text-align: center;
 }
+
+.todo-list {
+  /* Stildefinitionen für die gesamte ToDo-Liste */
+}
+
+.todo-list li {
+  /* Stildefinitionen für einzelne ToDo-Listenelemente */
+}
+
+.todo-list input[type="text"] {
+  font-family: Arial, sans-serif;
+  font-size: 16px; /* Beispiel für die Schriftgröße */
+  color: #333; /* Beispiel für die Textfarbe */
+  text-align: center;
+}
+  /* Stildefinitionen für das Eingabefeld */
+
+.todo-list button {
+  /* Stildefinitionen für die Schaltfläche */
+}

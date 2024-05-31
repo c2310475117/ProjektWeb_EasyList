@@ -2,110 +2,202 @@
 
 let svgIcon = ''; // Variable zum Speichern des SVG-Icons
 let toDoText = '';
+let lastItemId = null;
 
-async function start() {
-  await fetchMessage();
-}
 
-async function fetchMessage() {
-  try {
-    const response = await fetch('http://localhost:3000/api/message');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    document.getElementById('message').textContent = data.message;
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Daten:', error);
+class ToDoListManager {
+  constructor() {
+    this.init();
   }
-}
 
-async function fetchItems() {
-  try {
-    const response = await fetch('http://localhost:3000/items');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+  async init() {
+    await this.fetchItems('item');
+    await this.fetchItems('medication');
+    this.setupEventListeners();
+  }
+
+  renderItems(items, type) {
+    const itemList = document.getElementById('toDoListe');
+    itemList.innerHTML = ''; // Clear existing list
+
+    items.forEach(item => {
+      const listItem = document.createElement('li');
+      listItem.className = 'todo-list-item';
+      listItem.dataset.id = item.id;
+
+      const content = this.createItemContent(item, type);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'delete-button';
+      deleteButton.innerHTML = 'Delete';
+
+      listItem.appendChild(content);
+      listItem.appendChild(deleteButton);
+
+      itemList.appendChild(listItem);
+    });
+  }
+
+  createItemContent(item, type) {
+    const content = document.createElement('div');
+    content.className = 'todo-item-content';
+
+    if (type === 'medication') {
+      content.innerHTML = `
+        <div class="title">Title: ${item.title}</div>
+        <div class="id">ID: ${item.id}</div>
+        <div id="interactionDetail"></div>
+      `;
+    } else {
+      content.innerHTML = `
+        <div class="title-en">Title_en: ${item.title_en}</div>
+        <div class="title-de">Title_de: ${item.title_de}</div>
+        <div class="icon">${item.icon}</div>
+      `;
     }
-    const data = await response.json();
-    data.forEach(item => displayItemInList(item));
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Daten:', error);
+    return content;
+  }
+
+  async putKeyword(toDoText) {
+    try {
+      const response = await fetch('http://localhost:3000/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ keyword: toDoText })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Fetch items again to update the list
+      await this.fetchItems('item');
+    } catch (error) {
+      console.error('Fehler beim Senden des Keywords:', error);
+    }
+  }
+
+  async putMedication(toDoText) {
+    try {
+      const response = await fetch('http://localhost:3000/med', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ keyword: toDoText })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // Die Antwort des Servers wird in responseData gespeichert
+      const responseData = await response.json();
+      console.log('API response for medication:', responseData);
+  
+      // Abrufen der aktualisierten Medikamentenliste
+      await this.fetchItems('medication');
+  
+      // Setzen der letzten Medikamenten-ID
+      lastItemId = responseData.id;
+  
+      // Abrufen und Anzeigen der Wechselwirkungen
+      await this.fetchItems('compare');
+    } catch (error) {
+      console.error('Fehler beim Senden des Keywords:', error);
+    }
+  }
+
+  async fetchItems(type) {
+    try {
+      let endpoint;
+      if (type === 'medication') {
+        endpoint = 'http://localhost:3000/med';
+      } else if (type === 'item') {
+        endpoint = 'http://localhost:3000/items';
+      } else if (type === 'compare') {
+        endpoint = `http://localhost:3000/compare/${lastItemId}`;
+      }
+  
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      console.log(`Fetched ${type}:`, data);
+  
+      if (type !== 'compare') {
+        this.renderItems(data, type);
+      } else {
+        // Anzeigen der Wechselwirkungen im Frontend
+        const interactionDetailElement = document.getElementById('interactionDetail');
+        interactionDetailElement.innerHTML = data.interactionDetail;
+      }
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Daten:', error);
+    }
+  }
+  
+
+  async addToDo(event) {
+    event.preventDefault();
+
+    const toDoField = document.getElementById('ToDoField');
+    const toDoText = toDoField.value.trim();
+
+    if (toDoText === '') {
+      return;
+    }
+
+    const selectedItemType = document.getElementById('itemType').value;
+    if (selectedItemType === 'medication') {
+      await this.putMedication(toDoText);
+    } else {
+      await this.putKeyword(toDoText);
+    }
+
+    toDoField.value = '';
+  }
+
+  async deleteItem(itemId, type) {
+    try {
+      const endpoint = type === 'medication' ? `http://localhost:3000/med/${itemId}` : `http://localhost:3000/items/${itemId}`;
+      const response = await fetch(endpoint, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Fetch items again to update the list
+      await this.fetchItems(type);
+    } catch (error) {
+      console.error('Fehler beim Löschen des Items:', error);
+    }
+  }
+
+  setupEventListeners() {
+    document.getElementById('toDoForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await this.addToDo(event);
+    });
+
+    document.getElementById('toDoListe').addEventListener('click', (event) => {
+      const deleteButton = event.target.closest('.delete-button');
+      if (deleteButton) {
+        const listItem = deleteButton.closest('.todo-list-item');
+        const itemId = listItem.dataset.id;
+        const itemType = listItem.querySelector('.title-en') ? 'item' : 'medication';
+        this.deleteItem(itemId, itemType);
+      }
+    });
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetchMessage();
-  fetchItems();
-  
+  new ToDoListManager();
 });
-
-function displayItemInList(item) {
-  // Zuerst ein Listenelement erstellen
-  const listItem = document.createElement('li');
-
-  
-  // Den Inhalt des Items in das Listenelement einfügen
-  listItem.innerHTML = `
-    <div>Title_en: ${item.title_en}</div>
-    <div>Title_de: ${item.title_de}</div>
-  `;
-
-  // SVG-Icon einfügen
-  const iconContainer = document.createElement('div');
-  iconContainer.innerHTML = item.icon; // Hier setzen wir den SVG-Code ein
-  listItem.appendChild(iconContainer);
-
-  // Das Listenelement zur Liste hinzufügen
-  const itemList = document.getElementById('toDoListe');
-  itemList.appendChild(listItem);
-}
-
-function displayIcons(svgData) {
-  const iconList = document.getElementById('icon');
-  if (iconList) {
-    iconList.innerHTML = ''; // Clear previous entries
-    const listItem = document.createElement('div');
-    listItem.innerHTML = svgData; // Add SVG data directly as HTML
-    iconList.appendChild(listItem);
-  } else {
-    console.error('Target element for displaying icons not found.');
-  }
-}
-
-
-async function putKeyword(toDoText) {
-  try {
-    const response = await fetch('http://localhost:3000/items', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ keyword: toDoText })
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-  } catch (error) {
-    console.error('Fehler beim Senden des Keywords:', error);
-  }
-}
-
-async function addToDo(event) {
-  event.preventDefault(); // Verhindert das Standardverhalten des Formulars (Seiten-Reload)
-  
-  const toDoField = document.getElementById('ToDoField');
-  const toDoText = toDoField.value.trim();
-  
-  if (toDoText === '') {
-    return; // Leere Einträge ignorieren
-  }
-
-  await putKeyword(toDoText);
-
-  toDoField.value = ''; // Eingabefeld zurücksetzen
-}
-
-
-document.addEventListener('DOMContentLoaded', start);
-document.querySelector('form').addEventListener('submit', addToDo);
