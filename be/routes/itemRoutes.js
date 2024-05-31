@@ -7,7 +7,7 @@ import { getIconDatafromAPI } from '../controller/IconApi.js';
 const router = express.Router();
 
 // Erstellen eines neuen Items
-router.post('/', async (req, res) => {
+router.post('/items', async (req, res) => {
     const { keyword } = req.body;
     if (!keyword) {
       return res.status(400).send('Keyword is required');
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
   
 
 // Route zum Abrufen aller Items
-router.get('/', async (req, res) => {
+router.get('/items', async (req, res) => {
     try {
         // Alle Items aus der Datenbank abrufen
         const items = await Item.findAll();
@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
 });
 
 // Abrufen eines Items nach ID
-router.get('/:id', async (req, res) => {
+router.get('/items/:id', async (req, res) => {
     try {
         const item = await Item.findByPk(req.params.id);
         if (item) {
@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Aktualisieren eines Items
-router.put('/:id', async (req, res) => {
+router.put('/items/:id', async (req, res) => {
     try {
         const { icon } = req.body;
         const [updated] = await Item.update({ icon }, {
@@ -86,7 +86,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Löschen eines Items
-router.delete('/:id', async (req, res) => {
+router.delete('/items/:id', async (req, res) => {
     try {
         const deleted = await Item.destroy({
             where: { id: req.params.id }

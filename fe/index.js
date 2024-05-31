@@ -88,59 +88,61 @@ class ToDoListManager {
         },
         body: JSON.stringify({ keyword: toDoText })
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       // Die Antwort des Servers wird in responseData gespeichert
+          // Neues Medikament in der Liste erstellen
+          // const newMed = await Med.create({ id: data.id, title: data.title });
       const responseData = await response.json();
       console.log('API response for medication:', responseData);
-  
+
       // Abrufen der aktualisierten Medikamentenliste
       await this.fetchItems('medication');
-  
-      // Setzen der letzten Medikamenten-ID
-      lastItemId = responseData.id;
-  
-      // Abrufen und Anzeigen der Wechselwirkungen
-      await this.fetchItems('compare');
+
+      // Senden einer Anfrage an den /compare Endpunkt mit der neuen Medikamenten-ID (responseData.id)
+      const comparisonResults = await fetch(`http://localhost:3000/compare/${responseData.id}`);
+      
+      const comparisonData = await comparisonResults.json();
+      console.log(`Comparison results for new medication ${responseData.id}:`, comparisonData);
     } catch (error) {
       console.error('Fehler beim Senden des Keywords:', error);
     }
   }
 
-  async fetchItems(type) {
-    try {
-      let endpoint;
-      if (type === 'medication') {
-        endpoint = 'http://localhost:3000/med';
-      } else if (type === 'item') {
-        endpoint = 'http://localhost:3000/items';
-      } else if (type === 'compare') {
-        endpoint = `http://localhost:3000/compare/${lastItemId}`;
-      }
-  
-      const response = await fetch(endpoint);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      const data = await response.json();
-      console.log(`Fetched ${type}:`, data);
-  
-      if (type !== 'compare') {
-        this.renderItems(data, type);
-      } else {
-        // Anzeigen der Wechselwirkungen im Frontend
-        const interactionDetailElement = document.getElementById('interactionDetail');
-        interactionDetailElement.innerHTML = data.interactionDetail;
-      }
-    } catch (error) {
-      console.error('Fehler beim Abrufen der Daten:', error);
+async fetchItems(type) {
+  try {
+    let endpoint;
+    if (type === 'medication') {
+      endpoint = 'http://localhost:3000/med'; 
+    } else if (type === 'item') {
+      endpoint = 'http://localhost:3000/items';
+    } else if (type === 'compare') {
+      endpoint = `http://localhost:3000/compare/${lastItemId}`;
     }
+
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    console.log(`Fetched ${type}:`, data);
+
+    if (type !== 'compare') {
+      this.renderItems(data, type);
+    } else {
+      // Anzeigen der Wechselwirkungen im Frontend
+      const interactionDetailElement = document.getElementById('interactionDetail');
+      interactionDetailElement.innerHTML = data.interactionDetail;
+    }
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Daten:', error);
   }
-  
+}
+
 
   async addToDo(event) {
     event.preventDefault();
