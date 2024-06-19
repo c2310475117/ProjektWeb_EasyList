@@ -1,41 +1,42 @@
-//!-- backend/models/listModel.js -->
+import { Model, DataTypes } from 'sequelize';
+import Sequ from '../db.js'; // Annahme: sequelize-Verbindung wird exportiert
 
-/*
-import { DataTypes } from 'sequelize';
-import  Sequ from '../db.js';
+// Definition des Items-Modells
+class List extends Model {}
 
 // Definition des Listen-Modells
-const List = Sequ.define('List', {
-    id: {
+List.init ({
+   list_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
+
+    list_name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users',
+            model: 'Users', 
             key: 'id'
         }
     },
+
     created_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     },
-    // Felder für Übersetzungen
-    name_en: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    name_de: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    // Weitere Übersetzungen je nach Bedarf hinzufügen
+
 }, {
-    timestamps: false
+    sequelize: Sequ,
+    modelName: 'List',
+    timestamps: true,
+    underscored: true 
 });
 
+
 export default List;
-*/

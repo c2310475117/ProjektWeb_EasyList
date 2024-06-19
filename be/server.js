@@ -1,60 +1,46 @@
-//!-- backend/server.js -->
-
+// backend/server.js
 
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import bodyParser from 'body-parser'; 
 import itemRoutes from './routes/itemRoutes.js';
-import medRoutes from './routes/medRoutes.js'
-
+import medRoutes from './routes/medRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import Sequ from './db.js';
-
+import { authMiddleware, generateAccessToken , checkListAccess} from './auth.js'; 
 
 const app = express();
 const port = 3000;
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-Sequ.sync().then(() => console.log('Datenbank ist bereit')).catch(err => console.error('Fehler beim Synchronisieren der Datenbank:', err));
+// Statisches Verzeichnis
+const frontendPath = path.join(__dirname, '../fe');
+app.use(express.static(frontendPath));
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../fe')));
-
-
-app.post('/items', (req, res) => {
-  itemRoutes(req, res);
+// Route für die Standarddatei
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'register.html'));
 });
 
-app.get('/items', (req, res) => {
-  itemRoutes(req, res);
-});
+Sequ.sync()
+  .then(() => console.log('Datenbank ist bereit'))
+  .catch(err => console.error('Fehler beim Synchronisieren der Datenbank:', err));
 
-app.delete ('/items/:id', (req, res) => {
-  itemRoutes(req, res);
-});
+// Einbinden der Routen
+app.use('/user', userRoutes);
+app.use('/items', authMiddleware, checkListAccess, itemRoutes);
+app.use('/med', authMiddleware, checkListAccess, medRoutes);
 
-app.post('/med', (req, res) => {
-  medRoutes(req, res);
-});
-
-app.get('/med', (req, res) => {
-  medRoutes(req, res);
-});
-
-app.get('/compare/:newMedId', (req, res) => {
-  medRoutes(req, res);
-});
-
-app.delete ('/med/:id', (req, res) => {
-  medRoutes(req, res);
-});
-
+// Test-Route
 app.get('/api/message', (req, res) => {
   res.json({ message: 'HELLO!' });
 });
-
 
 app.listen(port, () => {
   console.log(`Server läuft auf http://localhost:${port}`);

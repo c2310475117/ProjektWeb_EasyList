@@ -2,38 +2,53 @@
 
 import express from 'express';
 import Item from '../models/itemModel.js';
+import List from '../models/listModel.js';
+import User from '../models/userModel.js';
+
 import { getIconDatafromAPI } from '../controller/IconApi.js';
+import  { authMiddleware, generateAccessToken , checkListAccess} from '../auth.js'; 
+
 
 const router = express.Router();
 
 // Erstellen eines neuen Items
-router.post('/items', async (req, res) => {
-    const { keyword } = req.body;
-    if (!keyword) {
-      return res.status(400).send('Keyword is required');
+router.post('/', authMiddleware, async (req, res) => {
+    const { keyword, userId } = req.body; // userId sollte vom Frontend gesendet werden
+    if (!keyword || !userId) {
+        return res.status(400).send('Keyword and userId are required');
     }
-    console.log('Empfangenes Keyword:', keyword);
-  
+    console.log('Empfangenes Keyword und userId:', keyword, userId);
+
     try {
-      const iconData = await getIconDatafromAPI(keyword);
-      if (!iconData) {
-        return res.status(500).send('Icon konnte nicht abgerufen werden');
-      }
-      console.log('Erhaltene Icon-Daten:', iconData);
-  
-      const newItem = await Item.create({ icon: iconData, title_en: keyword, title_de: keyword });
-  
-      // Erfolgreiche Antwort mit dem erstellten Item zurückgeben
-      res.status(201).json(newItem);
+        // Finde die Liste des Benutzers
+        const userLists = await List.findAll({ where: { user_id: userId } });
+        if (!userLists || userLists.length === 0) {
+            return res.status(404).send('Keine Liste für diesen Benutzer gefunden');
+        }
+
+        // Annahme: Wähle die erste Liste des Benutzers aus
+        const userList = userLists[0];
+
+        // Hier könntest du zusätzliches Logik einfügen, um zu überprüfen, ob der Benutzer Zugriff auf die Liste hat
+
+        const iconData = await getIconDatafromAPI(keyword);
+        if (!iconData) {
+            return res.status(500).send('Icon konnte nicht abgerufen werden');
+        }
+        console.log('Erhaltene Icon-Daten:', iconData);
+
+        const newItem = await Item.create({ list_id: userList.id, item_icon: iconData, item_title_en: keyword, item_title_de: keyword });
+
+        // Erfolgreiche Antwort mit dem erstellten Item zurückgeben
+        res.status(201).json(newItem);
     } catch (error) {
-      console.error('Fehler beim Verarbeiten des Keywords und Icons:', error);
-      res.status(500).send('Interner Serverfehler');
+        console.error('Fehler beim Verarbeiten des Keywords und Icons:', error);
+        res.status(500).send('Interner itemRoute-1 Serverfehler');
     }
-  });;
-  
+});
 
 // Route zum Abrufen aller Items
-router.get('/items', async (req, res) => {
+router.get('/', authMiddleware, checkListAccess, async (req, res) => {
     try {
         // Alle Items aus der Datenbank abrufen
         const items = await Item.findAll();
@@ -49,12 +64,12 @@ router.get('/items', async (req, res) => {
     } catch (error) {
         // Im Falle eines Fehlers beim Abrufen der Items sende eine entsprechende Fehlermeldung zurück
         console.error('Fehler beim Abrufen der Items:', error);
-        res.status(500).json({ error: 'Interner Serverfehler.' });
+        res.status(500).json({ error: 'Interner itemRoute-2 Serverfehler.' });
     }
 });
 
 // Abrufen eines Items nach ID
-router.get('/items/:id', async (req, res) => {
+router.get('/:id', authMiddleware, checkListAccess, async (req, res) => {
     try {
         const item = await Item.findByPk(req.params.id);
         if (item) {
@@ -68,11 +83,11 @@ router.get('/items/:id', async (req, res) => {
 });
 
 // Aktualisieren eines Items
-router.put('/items/:id', async (req, res) => {
+router.put('/:id', authMiddleware, checkListAccess, async (req, res) => {
     try {
         const { icon } = req.body;
         const [updated] = await Item.update({ icon }, {
-            where: { id: req.params.id }
+            where: { item_id: req.params.id }
         });
         if (updated) {
             const updatedItem = await Item.findByPk(req.params.id);
@@ -86,10 +101,10 @@ router.put('/items/:id', async (req, res) => {
 });
 
 // Löschen eines Items
-router.delete('/items/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, checkListAccess, async (req, res) => {
     try {
         const deleted = await Item.destroy({
-            where: { id: req.params.id }
+            where: { item_id: req.params.id }
         });
         if (deleted) {
             res.status(204).json({ message: 'Item erfolgreich gelöscht.' });

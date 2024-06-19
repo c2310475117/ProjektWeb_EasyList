@@ -7,6 +7,14 @@ h1 {
   text-align: center;
 }
 
+.todo-item-content {
+  /* Stildefinitionen für den Inhalt eines To-Do-Listenelements */
+  border: 1px solid #ccc; /* Beispiel für eine Randfarbe und -stil */
+  padding: 10px; /* Beispiel für Innenabstand */
+  margin-bottom: 10px; /* Beispiel für Außenabstand nach unten */
+  background-color: #f9f9f9; /* Beispiel für Hintergrundfarbe */
+}
+
 .todo-list {
   /* Stildefinitionen für die gesamte ToDo-Liste */
 }

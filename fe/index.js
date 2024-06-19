@@ -1,9 +1,9 @@
 //!-- frontend/index.js -->
 
+
 let svgIcon = ''; // Variable zum Speichern des SVG-Icons
 let toDoText = '';
 let lastItemId = null;
-
 
 class ToDoListManager {
   constructor() {
@@ -11,11 +11,21 @@ class ToDoListManager {
   }
 
   async init() {
+    // Überprüfen, ob der Benutzer authentifiziert ist
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('User not authenticated.');
+      // Handle unauthenticated user (redirect to login page, etc.)
+      return;
+    }
+
+    // Wenn authentifiziert, Listen und andere Daten laden
     await this.fetchItems('item');
     await this.fetchItems('medication');
+    await this.fetchItems('compare');
     this.setupEventListeners();
   }
-
+  
   renderItems(items, type) {
     const itemList = document.getElementById('toDoListe');
     itemList.innerHTML = ''; // Clear existing list
@@ -41,12 +51,12 @@ class ToDoListManager {
   createItemContent(item, type) {
     const content = document.createElement('div');
     content.className = 'todo-item-content';
-
-    if (type === 'medication') {
+  
+    if (type === 'medication' || type === 'compare') {
       content.innerHTML = `
         <div class="title">Title: ${item.title}</div>
         <div class="id">ID: ${item.id}</div>
-        <div id="interactionDetail"></div>
+        <div class="interactionDetail"></div>
       `;
     } else {
       content.innerHTML = `
@@ -79,6 +89,32 @@ class ToDoListManager {
     }
   }
 
+  async createItem(keyword, type) {
+    try {
+      const endpoint = type === 'medication' ? 'http://localhost:3000/med' : 'http://localhost:3000/items';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Beispiel für JWT-Token
+        },
+        body: JSON.stringify({ keyword })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const newItem = await response.json();
+      console.log('Neues Item erstellt:', newItem);
+  
+      // Fetch items again to update the list
+      await this.fetchItems(type);
+    } catch (error) {
+      console.error('Fehler beim Erstellen des Items:', error);
+    }
+  }
+  
   async putMedication(toDoText) {
     try {
       const response = await fetch('http://localhost:3000/med', {
@@ -94,8 +130,8 @@ class ToDoListManager {
       }
 
       // Die Antwort des Servers wird in responseData gespeichert
-          // Neues Medikament in der Liste erstellen
-          // const newMed = await Med.create({ id: data.id, title: data.title });
+      // Neues Medikament in der Liste erstellen
+      // const newMed = await Med.create({ id: data.id, title: data.title });
       const responseData = await response.json();
       console.log('API response for medication:', responseData);
 
@@ -112,37 +148,49 @@ class ToDoListManager {
     }
   }
 
-async fetchItems(type) {
-  try {
-    let endpoint;
-    if (type === 'medication') {
-      endpoint = 'http://localhost:3000/med'; 
-    } else if (type === 'item') {
-      endpoint = 'http://localhost:3000/items';
-    } else if (type === 'compare') {
-      endpoint = `http://localhost:3000/compare/${lastItemId}`;
-    }
+  
 
-    const response = await fetch(endpoint);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
+  async fetchItems(type) {
+    try {
+      let endpoint;
+      if (type === 'medication') {
+        endpoint = 'http://localhost:3000/med'; 
+      } else if (type === 'item') {
+        endpoint = 'http://localhost:3000/items';
+      } else if (type === 'compare') {
+        endpoint = `http://localhost:3000/compare/${lastItemId}`;
+      }
 
-    const data = await response.json();
-    console.log(`Fetched ${type}:`, data);
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-    if (type !== 'compare') {
-      this.renderItems(data, type);
-    } else {
-      // Anzeigen der Wechselwirkungen im Frontend
-      const interactionDetailElement = document.getElementById('interactionDetail');
-      interactionDetailElement.innerHTML = data.interactionDetail;
+      const data = await response.json();
+      console.log(`Fetched ${type}:`, data);
+
+      if (type !== 'compare') {
+        this.renderItems(data, type);
+      } else {
+        const interactionDetailElement = document.getElementById('.interactionDetail');
+        if (interactionDetailElement) {
+          interactionDetailElement.innerHTML = ''; // Clear previous interactions
+        
+          // Iterate through the interaction data and append each detail to the interactionDetailElement
+          comparisonData.forEach(interaction => {
+            const detail = document.createElement('div');
+            detail.textContent = interaction.interactionDetail;
+            interactionDetailElement.appendChild(detail);
+          });
+        } else {
+          console.error('Interaction detail element not found.');
+        }
+        }
+      
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Daten:', error);
     }
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Daten:', error);
   }
-}
-
 
   async addToDo(event) {
     event.preventDefault();

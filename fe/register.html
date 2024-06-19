@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login or Register</title>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="auth-container">
+    <header class="auth-header">
+      <h1>Login or Register</h1>
+    </header>
+    <main class="auth-main">
+      <section id="loginSection" style="display:block;">
+        <h2>Login</h2>
+        <form action="http://localhost:3000/user/login" method="post">
+
+          <input placeholder="Username" name="YourName" type="text">
+          <br>
+          <input placeholder="Password" name="Password" type="password">
+          <br>
+          <input class="sub" type="submit" value="Login">
+        </form>
+        <p>Don't have an account? <a href="#" onclick="toggleForm()">Register here</a></p>
+      </section>
+
+      <section id="registerSection" style="display:none;">
+        <h2>Register</h2>
+        <form action="http://localhost:3000/user/register" method="post">
+
+          <input placeholder="Name" name="YourName" type="text">
+          <br>
+          <input placeholder="Email" name="YourEmail" type="email">
+          <br>
+          <input placeholder="Password" name="Password" type="password">
+          <br>
+          <input class="sub" type="submit" value="Register">
+        </form>
+        <p>Already have an account? <a href="#" onclick="toggleForm()">Login here</a></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+  function toggleForm() {
+    const loginSection = document.getElementById('loginSection');
+    const registerSection = document.getElementById('registerSection');
+
+    if (loginSection.style.display === 'none') {
+        loginSection.style.display = 'block';
+        registerSection.style.display = 'none';
+    } else {
+        loginSection.style.display = 'none';
+        registerSection.style.display = 'block';
+    }
+}
+  </script>
+</body>
+</html>

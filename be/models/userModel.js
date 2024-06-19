@@ -1,33 +1,40 @@
 //!-- backend/models/listModel.js -->
 
-/*
-import { DataTypes } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import Sequ from '../db.js';
 
-// Definition des Benutzer-Modells
-const User = Sequ.define('User', {
-    id: {
+// Definition des Medications-Modells
+class User extends Model {}
+
+User.init({
+    user_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    username: {
+    
+    user_name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
+
     password_hash: {
         type: DataTypes.STRING,
         allowNull: false
     },
+
     email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     }
+
 }, {
-    timestamps: false
+    sequelize: Sequ,
+    modelName: 'User',
+    timestamps: true,
+    underscored: true
 });
 
 export default User;
-*/
