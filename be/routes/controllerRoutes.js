@@ -1,9 +1,13 @@
 //!-- backend/routes/controllerRoutes.js -->
 
-import User from './userModel.js';
-import List from './listModel.js';
-import Item from './itemModel.js';
-import Med from './medRoutes.js';
+import express from 'express';
+
+import User from '../models/userModel.js';
+import List from '../models/listModel.js';
+import Item from '../models/itemModel.js';
+import Med from '../models/medModel.js';
+
+const router = express.Router();
 
 const controllerRoutes = () => {
   User.hasMany(List, { foreignKey: 'user_id' });
