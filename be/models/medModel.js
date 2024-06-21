@@ -21,7 +21,7 @@ Med.init({
         allowNull: false,
         references: {
             model: 'Lists',
-            key: 'id'
+            key: 'list_id'
         }
     },
 
@@ -37,7 +37,7 @@ Med.init({
 
 }, {
     sequelize: Sequ, 
-    modelName: 'Meds',
+    modelName: 'Med',
     tableName: 'meds', 
     timestamps: false,
     underscored: true

@@ -9,7 +9,9 @@ import itemRoutes from './routes/itemRoutes.js';
 import medRoutes from './routes/medRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
-import { authMiddleware, generateAccessToken , checkListAccess} from './auth.js'; 
+import { controllerRoutes } from './routes/controllerRoutes.js'
+
+import { authMiddleware, checkListAccess} from './auth.js'; 
 import { syncDatabase } from './db.js'; 
 
 const app = express();
@@ -31,11 +33,16 @@ app.get('/', (req, res) => {
 
 // Synchronize the database
 // Synchronize the database
+// Synchronize the database
 syncDatabase().then(() => {
-  // Einbinden der Routen
+  // Einbinden der 
+  app.use('/controllerRoutes', controllerRoutes);
   app.use('/user', userRoutes);
   app.use('/items', authMiddleware, checkListAccess, itemRoutes);
   app.use('/med', authMiddleware, checkListAccess, medRoutes);
+
+  // Beispiel: Verwendung der controllerRoutes
+  controllerRoutes(); // Hier werden die Beziehungen zwischen den Modellen konfiguriert
 
   // Test-Route
   app.get('/api/message', (req, res) => {

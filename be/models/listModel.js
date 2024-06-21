@@ -25,8 +25,8 @@ List.init ({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', 
-            key: 'id'
+            model: 'User', 
+            key: 'user_id'
         }
     },
 
@@ -37,11 +37,11 @@ List.init ({
 
 }, {
     sequelize: Sequ,
-    modelName: 'Lists',
+    modelName: 'List',
     tableName: 'lists', 
     timestamps: true,
     underscored: true 
 });
 
-
 export default List;
+

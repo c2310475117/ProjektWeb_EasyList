@@ -4,10 +4,9 @@ import express from 'express';
 import User from '../models/userModel.js';
 import List from '../models/listModel.js';
 import bcrypt from 'bcrypt';
-import {Op} from 'sequelize';
 import jwt from 'jsonwebtoken';
-import  { authMiddleware, generateAccessToken , checkListAccess} from '../auth.js'; 
-
+import { generateAccessToken, verifyToken } from '../auth.js';
+import { Op } from 'sequelize';
 
 
 const router = express.Router();
@@ -36,6 +35,7 @@ const getUserLists = async (userId) => {
     throw error;
   }
 };
+
 
 /// Beispiel: Registrierung eines neuen Benutzers
 router.post('/register', async (req, res) => {
@@ -92,22 +92,43 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Incorrect password' });
     }
 
-    // Erstellung eines JWTs mit Benutzer-ID und einem geheimen Schlüssel
-    const token = jwt.sign({ user_id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+     // Erstellung eines JWTs mit Benutzer-ID und einem geheimen Schlüssel
+     const token = generateAccessToken(user.user_id);
 
     // Erfolgreiche Antwort mit JWT zurückgeben
-    res.status(200).json({ token });
+    /*res.json ({
+      // 
+    })
+      */
+    res.status(200).json({ token, user_id: user.user_id, });
   } catch (error) {
     console.error('Error logging in:', error);
-    res.status(500).json({ error: 'Internal userRoute-2 server error' });
+    res.status(500).json({ error: 'Internal server error' });
   }
+});
 
+  router.delete ('/:userid', verifyToken, async (req, res) => {
+    try {
+    if (req.user.user_id === req.params.user.user_id){
+      res.status(200).json ("User wurde gelöscht")
+        // Hier kannst du die Löschlogik für den Benutzer implementieren
+        res.status(200).json({ message: 'User wurde gelöscht' });
+      } else {
+        res.status(403).json({ message: 'Keine Berechtigung um den User zu löschen' });
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+  /*
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
   });
+*/
 
-});
 
 
-export default router;
+export default router;  

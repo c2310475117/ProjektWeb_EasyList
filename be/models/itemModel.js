@@ -5,6 +5,7 @@ import { Model, DataTypes, Sequelize } from 'sequelize';
 
 import Sequ from '../db.js';
 
+
 // Definition des Items-Modells
 class Item extends Model {}
 
@@ -19,8 +20,8 @@ Item.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Lists',
-            key: 'id'
+            model: 'List',
+            key: 'list_id'
         }
     },
     
@@ -51,5 +52,6 @@ Item.init({
     underscored: true
 });
 
-
 export default Item;
+
+

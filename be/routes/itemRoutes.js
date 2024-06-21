@@ -51,7 +51,8 @@ router.post('/', authMiddleware, async (req, res) => {
 router.get('/', authMiddleware, checkListAccess, async (req, res) => {
     try {
         // Alle Items aus der Datenbank abrufen
-        const items = await Item.findAll();
+        const items = await Item.findAll({ where: { list_id: req.query.list_id, user_id: req.user.user_id } });
+        res.status(200).json(items);
 
         // Überprüfen, ob Items gefunden wurden
         if (items.length > 0) {

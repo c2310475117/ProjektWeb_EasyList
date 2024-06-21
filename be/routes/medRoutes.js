@@ -37,7 +37,8 @@ router.post('/', authMiddleware, checkListAccess, async (req, res) => {
 
 router.get('/', authMiddleware, checkListAccess, async (req, res) => {
     try {
-        const meds = await Med.findAll(); // Alle Medikamente abrufen
+        const meds = await Med.findAll({ where: { list_id: req.query.list_id, user_id: req.user.user_id } });
+        res.status(200).json(items);
         res.status(200).json(meds);
     } catch (error) {
         res.status(500).json({ error: 'Fehler beim Abrufen der Medikamente.' });

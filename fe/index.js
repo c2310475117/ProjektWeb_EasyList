@@ -5,6 +5,38 @@ let svgIcon = ''; // Variable zum Speichern des SVG-Icons
 let toDoText = '';
 let lastItemId = null;
 
+// Beim Erhalt des Tokens nach dem Login
+const handleLogin = async (username, password) => {
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ YourName: username, Password: password }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.user_id);
+      // Optional: Speichern weiterer Informationen oder Aktualisieren der UI
+    } else {
+      // Fehlerbehandlung
+    }
+  } catch (error) {
+    console.error('Error during login:', error);
+    // Fehlerbehandlung
+  }
+};
+
+// Beispiel für das Löschen des Tokens
+const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('userId');
+  // Optional: Weiteres Cleanup oder UI-Aktualisierungen
+}
+
 class ToDoListManager {
   constructor() {
     this.init();

@@ -1,9 +1,8 @@
 //!-- backend/models/listModel.js -->
 
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Model, DataTypes} from 'sequelize';
 
 import Sequ from '../db.js';
-
 
 
 // Definition des Medications-Modells
@@ -35,10 +34,12 @@ User.init({
 
 }, {
     sequelize: Sequ,
-    modelName: 'Users',
+    modelName: 'User',
     tableName: 'users', 
     timestamps: true,
     underscored: true
 });
 
 export default User;
+
+
