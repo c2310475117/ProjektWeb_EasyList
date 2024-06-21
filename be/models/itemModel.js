@@ -1,31 +1,9 @@
 //!-- backend/models/itemModel.js -->
 
-import express from 'express';
+
 import { Model, DataTypes, Sequelize } from 'sequelize';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import cors from 'cors';
-// import Sequ from '../db.js';
 
-const router = express.Router();
-
-const app = express();
-app.use(cors());
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const databaseFilePath = path.join(__dirname, 'Database', 'EasyListDB.sqlite');
-
-// Statisches Verzeichnis
-const frontendPath = path.join(__dirname, '../fe');
-app.use(express.static(frontendPath));
-
-// Verbindung zur Datenbank herstellen
-const Sequ = new Sequelize({
-    dialect: 'sqlite',
-    storage: databaseFilePath // Speicherort der SQLite-Datenbankdatei
-});
+import Sequ from '../db.js';
 
 // Definition des Items-Modells
 class Item extends Model {}
@@ -68,6 +46,7 @@ Item.init({
 }, {
     sequelize: Sequ,
     modelName: 'Item',
+    tableName: 'items', 
     timestamps: true,
     underscored: true
 });

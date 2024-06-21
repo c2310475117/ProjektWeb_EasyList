@@ -8,8 +8,9 @@ import bodyParser from 'body-parser';
 import itemRoutes from './routes/itemRoutes.js';
 import medRoutes from './routes/medRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import Sequ from './db.js';
+
 import { authMiddleware, generateAccessToken , checkListAccess} from './auth.js'; 
+import { syncDatabase } from './db.js'; 
 
 const app = express();
 const port = 3000;
@@ -28,20 +29,20 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(frontendPath, 'register.html'));
 });
 
-Sequ.sync()
-  .then(() => console.log('Datenbank ist bereit'))
-  .catch(err => console.error('Fehler beim Synchronisieren der Datenbank:', err));
+// Synchronize the database
+// Synchronize the database
+syncDatabase().then(() => {
+  // Einbinden der Routen
+  app.use('/user', userRoutes);
+  app.use('/items', authMiddleware, checkListAccess, itemRoutes);
+  app.use('/med', authMiddleware, checkListAccess, medRoutes);
 
-// Einbinden der Routen
-app.use('/user', userRoutes);
-app.use('/items', authMiddleware, checkListAccess, itemRoutes);
-app.use('/med', authMiddleware, checkListAccess, medRoutes);
+  // Test-Route
+  app.get('/api/message', (req, res) => {
+    res.json({ message: 'HELLO!' });
+  });
 
-// Test-Route
-app.get('/api/message', (req, res) => {
-  res.json({ message: 'HELLO!' });
-});
-
-app.listen(port, () => {
-  console.log(`Server läuft auf http://localhost:${port}`);
+  app.listen(port, () => {
+    console.log(`Server läuft auf http://localhost:${port}`);
+  });
 });

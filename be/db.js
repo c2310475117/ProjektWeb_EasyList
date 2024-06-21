@@ -1,21 +1,11 @@
-//!-- backend/db.js -->
-
 import { Sequelize } from 'sequelize';
-// import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import controllerRoutes from './routes/controllerRoutes.js';
 
-// import der models !! um sicherzustellen, dass die init-Methoden der Modelle ausgeführt werden 
-// und die Modelle bei der Sequelize-Instanz registriert werden.
-import Item from './models/itemModel.js';
-import User from './models/userModel.js';
-import List from './models/listModel.js';
-import Med from './models/medModel.js';
-
+// Konvertiert die URL der aktuellen Datei in Dateipfad.
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+// Verbindet den Verzeichnispfad (__dirname) mit weiteren Verzeichnisebenen + Dateinamen (EasyListDB.sqlite)
 const databaseFilePath = path.join(__dirname, 'Database', 'EasyListDB.sqlite');
 
 // Verbindung zur Datenbank herstellen
@@ -24,18 +14,17 @@ const Sequ = new Sequelize({
     storage: databaseFilePath // Speicherort der SQLite-Datenbankdatei
 });
 
-controllerRoutes();
-
 // Synchronisiere alle Modelle
 const syncDatabase = async () => {
     try {
-        await Sequ.sync({ force: true }); // force: true wird alle Tabellen löschen und neu erstellen, verwenden Sie dies mit Vorsicht.
-        console.log('Datenbank synchronisiert');
-    } catch (err) {
-        console.error('Fehler beim Synchronisieren der Datenbank:', err);
+        await Sequ.authenticate();
+        console.log('Verbindung zur Datenbank erfolgreich hergestellt.');
+        await Sequ.sync({ alter: true });
+        console.log('Datenbank synchronisiert.');
+    } catch (error) {
+        console.error('Fehler bei der Verbindung zur Datenbank in db.js:', error);
     }
 };
 
-syncDatabase();
-
-export default Sequ ;
+export { Sequ, syncDatabase };
+export default Sequ;

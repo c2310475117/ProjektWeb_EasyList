@@ -49,7 +49,7 @@ router.post('/register', async (req, res) => {
     // Überprüfen, ob Benutzer bereits existiert
     let existingUser = await User.findOne({
       where: {
-        [Op.or]: [{ username: YourName }, { email: YourEmail }]
+        [Op.or]: [{ user_name: YourName }, { email: YourEmail }]
       }
     });
 
@@ -60,7 +60,7 @@ router.post('/register', async (req, res) => {
     // Passwort hashen und neuen Benutzer erstellen
     const hashedPassword = await bcrypt.hash(Password, 10);
     const newUser = await User.create({
-      username: YourName,
+      user_name: YourName,
       email: YourEmail,
       password_hash: hashedPassword,
     });
@@ -82,7 +82,7 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ where: { username: YourName } });
+    const user = await User.findOne({ where: { user_name: YourName } });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -93,7 +93,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Erstellung eines JWTs mit Benutzer-ID und einem geheimen Schlüssel
-    const token = jwt.sign({ userId: user.id }, 'your_secret_key', { expiresIn: '1h' });
+    const token = jwt.sign({ user_id: user.id }, 'your_secret_key', { expiresIn: '1h' });
 
     // Erfolgreiche Antwort mit JWT zurückgeben
     res.status(200).json({ token });
