@@ -17,26 +17,8 @@ const Sequ = new Sequelize({
 // Synchronisiere alle Modelle
 const syncDatabase = async () => {
     try {
-        //authenticate gibt einen promis zurück 
-        //dass die Verbindung zur DB erfolgreich hergestellt werden kann, 
-        //bevor Sequelize weiter synchronisiert wird und mit der Datenbankinteraktion beginnt.
         await Sequ.authenticate();
         console.log('Verbindung zur Datenbank erfolgreich hergestellt.');
-
-           // Importiere Modelle
-        const { default: Item } = await import('./models/itemModel.js');
-        const { default: List } = await import('./models/listModel.js');
-        const { default: Med } = await import('./models/medModel.js');
-        const { default: User } = await import('./models/userModel.js');
-
-        // Synchronisiere Modelle mit der Datenbank
-        await User.sync();
-        await List.sync();
-        await Item.sync();
-        await Med.sync();
-
-        await Sequ.sync({ alter: true });
-        console.log('Datenbank synchronisiert.');
     } catch (error) {
         console.error('Fehler bei der Verbindung zur Datenbank in db.js:', error);
     }

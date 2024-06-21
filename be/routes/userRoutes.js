@@ -112,12 +112,13 @@ router.post('/login', async (req, res) => {
 // Route zum Abrufen der Listen eines Benutzers
 router.get('/lists', verifyToken, async (req, res) => {
   try {
-    const userId = req.user.user_id;
-    const lists = await getUserLists(userId);
-    res.status(200).json({ lists });
+    const userId = req.user.user_id; // Benutzer-ID aus dem Token
+    const lists = await getUserLists(userId); // Funktion zum Abrufen der Listen
+
+    res.status(200).json({ lists }); // Erfolgreiche Antwort mit den Listen des Benutzers
   } catch (error) {
-    console.error('Error fetching user lists:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Fehler beim Abrufen der Listen:', error);
+    res.status(500).json({ error: 'Interner Serverfehler' });
   }
 });
 

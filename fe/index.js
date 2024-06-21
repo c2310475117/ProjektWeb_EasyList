@@ -77,6 +77,24 @@ class ToDoListManager {
       console.error('Fehler beim Abrufen der Listen des Benutzers:', error);
     }
   }
+  
+  renderUserLists(lists) {
+    const listContainer = document.getElementById('listContainer');
+    listContainer.innerHTML = '';
+
+    lists.forEach(list => {
+      const listElement = document.createElement('div');
+      listElement.innerHTML = `<h3>${list.list_name}</h3>`;
+      listContainer.appendChild(listElement);
+
+      // Beispiel: Rendern der Items dieser Liste
+      list.items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.innerHTML = `<p>${item.title}</p>`;
+        listElement.appendChild(itemElement);
+      });
+    });
+  }
 
   renderItems(items, type) {
     const itemList = document.getElementById('toDoListe');
