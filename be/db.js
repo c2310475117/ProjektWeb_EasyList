@@ -23,10 +23,17 @@ const syncDatabase = async () => {
         await Sequ.authenticate();
         console.log('Verbindung zur Datenbank erfolgreich hergestellt.');
 
-        import('./models/itemModel.js');
-        import('./models/listModel.js');
-        import('./models/medModel.js');
-        import('./models/userModel.js');
+           // Importiere Modelle
+        const { default: Item } = await import('./models/itemModel.js');
+        const { default: List } = await import('./models/listModel.js');
+        const { default: Med } = await import('./models/medModel.js');
+        const { default: User } = await import('./models/userModel.js');
+
+        // Synchronisiere Modelle mit der Datenbank
+        await User.sync();
+        await List.sync();
+        await Item.sync();
+        await Med.sync();
 
         await Sequ.sync({ alter: true });
         console.log('Datenbank synchronisiert.');

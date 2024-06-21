@@ -1,10 +1,11 @@
 //!-- backend/models/itemModel.js -->
 
 
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Model, DataTypes} from 'sequelize';
 
 import Sequ from '../db.js';
 
+import List from './listModel.js';
 
 // Definition des Items-Modells
 class Item extends Model {}
@@ -20,7 +21,7 @@ Item.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'List',
+            model: List,
             key: 'list_id'
         }
     },

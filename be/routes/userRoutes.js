@@ -65,8 +65,10 @@ router.post('/register', async (req, res) => {
       password_hash: hashedPassword,
     });
 
+    const newList = await createList(newUser.user_id, 'Default List');
+
     // Erfolgreiche Antwort zurückgeben
-    res.status(201).json({ newUser });
+    res.status(201).json({ newUser, newList });
   } catch (error) {
     console.error('Error saving user to database:', error);
     res.status(500).send('Internal userRoute-1 server error');
@@ -84,7 +86,7 @@ router.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ where: { user_name: YourName } });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'userRoutes : User not found' });
     }
 
     const passwordMatch = await bcrypt.compare(Password, user.password_hash);
@@ -107,21 +109,51 @@ router.post('/login', async (req, res) => {
   }
 });
 
-  router.delete ('/:userid', verifyToken, async (req, res) => {
-    try {
-    if (req.user.user_id === req.params.user.user_id){
-      res.status(200).json ("User wurde gelöscht")
-        // Hier kannst du die Löschlogik für den Benutzer implementieren
-        res.status(200).json({ message: 'User wurde gelöscht' });
-      } else {
-        res.status(403).json({ message: 'Keine Berechtigung um den User zu löschen' });
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ error: 'Internal server error' });
+// Route zum Abrufen der Listen eines Benutzers
+router.get('/lists', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const lists = await getUserLists(userId);
+    res.status(200).json({ lists });
+  } catch (error) {
+    console.error('Error fetching user lists:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.delete('/:userId', verifyToken, async (req, res) => {
+  const userIdToDelete = req.params.userId; // Die Benutzer-ID, die gelöscht werden soll
+  const requestingUserId = req.user.user_id; // Die Benutzer-ID des anfragenden Benutzers
+
+  try {
+    // Prüfen, ob der anfragende Benutzer die Berechtigung hat, den Benutzer zu löschen
+    if (requestingUserId !== userIdToDelete) {
+      return res.status(403).json({ message: 'Keine Berechtigung, um den Benutzer zu löschen' });
     }
-  });
-  
+
+    // Hier implementiere die Logik zum Löschen des Benutzers und aller zugehörigen Listen, etc.
+    // Beispiel: Benutzer löschen
+    const deletedUser = await User.findByPk(userIdToDelete);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'Benutzer nicht gefunden' });
+    }
+
+    await deletedUser.destroy();
+
+    // Zusätzliche Logik für das Löschen von Listen, falls benötigt
+    // Beispiel: Löschen aller Listen des Benutzers
+    await List.destroy({
+      where: { user_id: userIdToDelete }
+    });
+
+    res.status(200).json({ message: 'Benutzer erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('Fehler beim Löschen des Benutzers:', error);
+    res.status(500).json({ error: 'Interner Serverfehler beim Löschen des Benutzers' });
+  }
+});
+
   /*
   app.use((req, res, next) => {
     console.log(`${req.method} ${req.url}`);

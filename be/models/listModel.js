@@ -1,9 +1,11 @@
 //!-- backend/models/listModel.js -->
 
 
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Model, DataTypes} from 'sequelize';
 
 import Sequ from '../db.js';
+
+import User from './userModel.js';
 
 // Definition des Items-Modells
 class List extends Model {}
@@ -25,7 +27,7 @@ List.init ({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'User', 
+            model: User, 
             key: 'user_id'
         }
     },

@@ -58,6 +58,26 @@ class ToDoListManager {
     this.setupEventListeners();
   }
   
+  async fetchUserLists() {
+    try {
+      const response = await fetch('http://localhost:3000/user/lists', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      this.renderUserLists(data.lists);
+    } catch (error) {
+      console.error('Fehler beim Abrufen der Listen des Benutzers:', error);
+    }
+  }
+
   renderItems(items, type) {
     const itemList = document.getElementById('toDoListe');
     itemList.innerHTML = ''; // Clear existing list

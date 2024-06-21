@@ -1,10 +1,11 @@
 // backend/models/medModel.js
 
 
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 
 import Sequ from '../db.js';
 
+import List from './listModel.js';
 
 // Definition des Medications-Modells
 class Med extends Model {}
@@ -20,7 +21,7 @@ Med.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Lists',
+            model: List,
             key: 'list_id'
         }
     },

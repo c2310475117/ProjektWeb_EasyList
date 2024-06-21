@@ -82,7 +82,7 @@ router.get('/:id', authMiddleware, checkListAccess, async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Abrufen des Items.' });
     }
 });
-
+/*
 // Aktualisieren eines Items
 router.put('/:id', authMiddleware, checkListAccess, async (req, res) => {
     try {
@@ -100,6 +100,7 @@ router.put('/:id', authMiddleware, checkListAccess, async (req, res) => {
         res.status(500).json({ error: 'Fehler beim Aktualisieren des Items.' });
     }
 });
+*/
 
 // Löschen eines Items
 router.delete('/:id', authMiddleware, checkListAccess, async (req, res) => {
