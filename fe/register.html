@@ -3,59 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login or Register</title>
+  <title>To-Do List</title>
   <!-- Custom CSS -->
   <link rel="stylesheet" href="index.css">
+  <!-- META TAG -- Redirect to register.html -->
+  <!-- meta http-equiv="refresh" content="0; URL=register.html" -->
 </head>
 <body>
-  <div class="auth-container">
-    <header class="auth-header">
-      <h1>Login or Register</h1>
+  <div class="todo-list-container">
+    <header class="todo-list-header">
+      <h1>To-Do List</h1>
     </header>
-    <main class="auth-main">
-      <section id="loginSection" style="display:block;">
-        <h2>Login</h2>
-        <form action="http://localhost:3000/user/login" method="post">
-
-          <input placeholder="Username" name="YourName" type="text">
-          <br>
-          <input placeholder="Password" name="Password" type="password">
-          <br>
-          <input class="sub" type="submit" value="Login">
+    <main class="todo-list-main">
+      <div class="page-content">
+        <!-- Form to add new to-do items -->
+        <form id="toDoForm">
+          <div class="input-wrapper">
+            <input type="text" id="ToDoField" placeholder="New To-Do">
+            <!-- Dropdown list for selecting the type -->
+            <select id="itemType">
+              <option value="item">Item</option>
+              <option value="medication">Medication</option>
+            </select>
+            <button type="submit">ADD</button>
+          </div>
         </form>
-        <p>Don't have an account? <a href="#" onclick="toggleForm('register')">Register here</a></p>
-      </section>
-
-      <section id="registerSection" style="display:none;">
-        <h2>Register</h2>
-        <form action="http://localhost:3000/user/register" method="post">
-
-          <input placeholder="Username"  name="YourName" type="text">
-          <br>
-          <input placeholder="Email" name="YourEmail" type="email">
-          <br>
-          <input placeholder="Password" name="Password" type="password">
-          <br>
-          <input class="sub" type="submit" value="Register">
-        </form>
-        <p>Already have an account? <a href="#" onclick="toggleForm('login')">Login here</a></p>
-      </section>
+        <!-- To-Do list -->
+        <ul id="toDoListe" class="todo-list">
+        </ul>
+        <!-- Interaction detail display -->
+        <div id="interactionDetail"></div>
+      </div>
     </main>
   </div>
-
-  <script>
-    function toggleForm(formId) {
-      const loginSection = document.getElementById('loginSection');
-      const registerSection = document.getElementById('registerSection');
-    
-      if (formId === 'login') {
-        loginSection.style.display = 'block';
-        registerSection.style.display = 'none';
-      } else if (formId === 'register') {
-        loginSection.style.display = 'none';
-        registerSection.style.display = 'block';
-      }
-    }
-  </script>
+  <!-- Custom JavaScript -->
+  <script src="./index.js" defer></script>
 </body>
 </html>
