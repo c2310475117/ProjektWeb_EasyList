@@ -34,11 +34,13 @@ syncDatabase().then(() => {
   // Debugging Ausgabe, um sicherzustellen, dass der Server gestartet ist
   console.log('Server gestartet. Weiterleitung zur Registrierungsseite.');
 
+  /*
   // Weiterleitung zur Registrierungsseite, wenn die Wurzelroute aufgerufen wird
   app.get('/', (req, res) => {
     console.log('Anfrage zur Wurzelroute erhalten. Weiterleite zur Registrierungsseite.');
     res.sendFile(path.join(frontendPath, 'register.html')); // Sicherstellen, dass der Pfad korrekt ist
   });
+*/
 
   // Weitere Routen für Benutzer, Items und Medikamente
   controllerRoutes(); // Vor den Routen aufrufen

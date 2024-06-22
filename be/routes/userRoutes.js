@@ -52,7 +52,7 @@ router.post('/register', async (req, res) => {
     });
 
     if (existingUser) {
-      return res.redirect('http://localhost:3001/login.html');
+      return res.redirect(`http://localhost:3001/register.html?token=${token}&user_id=${user.user_id}`);
     }
 
     const hashedPassword = await bcrypt.hash(Password, 10);
@@ -64,7 +64,7 @@ router.post('/register', async (req, res) => {
 
     const newList = await createList(newUser.user_id);
 
-    res.redirect('http://localhost:3001/register.html'); 
+    res.redirect('http://localhost:3001/index.html');
   } catch (error) {
     console.error('Error saving user to database:', error);
     res.status(500).send('Internal userRoute-1 server error');
@@ -91,7 +91,7 @@ router.post('/login', async (req, res) => {
 
     const token = generateAccessToken(user.user_id);
     // Redirect to frontend index.html (or index.js) with token and user_id query parameters
-    res.redirect(`http://localhost:3001/index.html?token=${token}&user_id=${user.user_id}`);
+    res.redirect(`http://localhost:3001/register.html?token=${token}&user_id=${user.user_id}`);
 
   } catch (error) {
     console.error('Error logging in:', error);
