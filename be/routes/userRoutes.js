@@ -45,7 +45,6 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Check if user already exists
     const existingUser = await User.findOne({
       where: {
         [Op.or]: [{ user_name: YourName }, { email: YourEmail }]
@@ -53,10 +52,9 @@ router.post('/register', async (req, res) => {
     });
 
     if (existingUser) {
-      return res.redirect('http://localhost:3001/login.html'); // Example for redirection
+      return res.redirect('http://localhost:3001/login.html');
     }
 
-    // Hash the password and create new user
     const hashedPassword = await bcrypt.hash(Password, 10);
     const newUser = await User.create({
       user_name: YourName,
@@ -64,19 +62,16 @@ router.post('/register', async (req, res) => {
       password_hash: hashedPassword,
     });
 
-    // Create default list for new user
     const newList = await createList(newUser.user_id);
 
-    // Successful response
-    res.status(201).json({ newUser, newList });
+    res.redirect('http://localhost:3001/register.html'); 
   } catch (error) {
     console.error('Error saving user to database:', error);
     res.status(500).send('Internal userRoute-1 server error');
   }
 });
 
-
-
+// Login
 router.post('/login', async (req, res) => {
   const { YourName, Password } = req.body;
   if (!YourName || !Password) {
@@ -94,26 +89,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Incorrect password' });
     }
 
-    // Generate JWT with user ID
     const token = generateAccessToken(user.user_id);
+    // Redirect to frontend index.html (or index.js) with token and user_id query parameters
+    res.redirect(`http://localhost:3001/index.html?token=${token}&user_id=${user.user_id}`);
 
-    // Successful response with JWT
-    res.status(200).json({ token, user_id: user.user_id });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.get('/lists', verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.user_id; // User ID from token
-    const lists = await getUserLists(userId); // Function to get lists
-
-    res.status(200).json({ lists }); // Successful response with user lists
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Listen:', error);
-    res.status(500).json({ error: 'Interner Serverfehler' });
   }
 });
 

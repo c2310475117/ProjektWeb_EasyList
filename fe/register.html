@@ -23,7 +23,7 @@
           <br>
           <input class="sub" type="submit" value="Login">
         </form>
-        <p>Don't have an account? <a href="#" onclick="toggleForm()">Register here</a></p>
+        <p>Don't have an account? <a href="#" onclick="toggleForm('register')">Register here</a></p>
       </section>
 
       <section id="registerSection" style="display:none;">
@@ -38,24 +38,24 @@
           <br>
           <input class="sub" type="submit" value="Register">
         </form>
-        <p>Already have an account? <a href="#" onclick="toggleForm()">Login here</a></p>
+        <p>Already have an account? <a href="#" onclick="toggleForm('login')">Login here</a></p>
       </section>
     </main>
   </div>
 
   <script>
-  function toggleForm() {
-    const loginSection = document.getElementById('loginSection');
-    const registerSection = document.getElementById('registerSection');
-
-    if (loginSection.style.display === 'none') {
+    function toggleForm(formId) {
+      const loginSection = document.getElementById('loginSection');
+      const registerSection = document.getElementById('registerSection');
+    
+      if (formId === 'login') {
         loginSection.style.display = 'block';
         registerSection.style.display = 'none';
-    } else {
+      } else if (formId === 'register') {
         loginSection.style.display = 'none';
         registerSection.style.display = 'block';
+      }
     }
-}
   </script>
 </body>
 </html>
