@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="index.css">
-  <!-- META TAG -- Redirect to register.html -->
-  <!-- meta http-equiv="refresh" content="0; URL=register.html" -->
 </head>
 <body>
   <div class="todo-list-container">
@@ -16,27 +13,23 @@
     </header>
     <main class="todo-list-main">
       <div class="page-content">
-        <!-- Form to add new to-do items -->
-        <form id="toDoForm">
-          <div class="input-wrapper">
-            <input type="text" id="ToDoField" placeholder="New To-Do">
-            <!-- Dropdown list for selecting the type -->
-            <select id="itemType">
-              <option value="item">Item</option>
-              <option value="medication">Medication</option>
-            </select>
-            <button type="submit">ADD</button>
-          </div>
+        <form id="createListForm">
+          <input type="text" id="listName" placeholder="Neue Liste hinzufügen...">
+          <button type="submit">Liste erstellen</button>
         </form>
-        <!-- To-Do list -->
-        <ul id="toDoListe" class="todo-list">
-        </ul>
-        <!-- Interaction detail display -->
-        <div id="interactionDetail"></div>
+        <div id="listContainer"></div>
       </div>
     </main>
+
+    <form id="toDoForm">
+      <input type="text" id="ToDoField" placeholder="Neues Element oder Medikation hinzufügen...">
+      <select id="itemType">
+        <option value="item">Item</option>
+        <option value="medication">Medication</option>
+      </select>
+      <button type="submit">Hinzufügen</button>
+    </form>
   </div>
-  <!-- Custom JavaScript -->
-  <script src="./index.js" defer></script>
+  <script src="index.js" type="module"></script>
 </body>
 </html>

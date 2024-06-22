@@ -5,8 +5,9 @@ import User from '../models/userModel.js';
 import List from '../models/listModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { generateAccessToken, verifyToken } from '../auth.js';
+import { generateAccessToken, checkListAccess, verifyToken } from '../auth.js';
 import { Op } from 'sequelize';
+
 
 
 const router = express.Router();
@@ -24,18 +25,39 @@ const createList = async (userId) => {
   }
 };
 
-const getUserLists = async (userId) => {
+router.post('/lists', checkListAccess, createList);
+
+router.get('/lists/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
   try {
-    const lists = await List.findAll({
-      where: { l_user_id: userId }
-    });
-    return lists;
+    const lists = await getUserLists(userId);
+    res.status(200).json({ lists });
   } catch (error) {
     console.error('Fehler beim Abrufen der Listen des Benutzers:', error);
-    throw error;
+    res.status(500).json({ error: 'Interner Serverfehler beim Abrufen der Listen' });
   }
-};
+});
 
+const getUserLists = async (req, res) => {
+  const userId = req.params.userId; // Benutzer-ID aus der URL-Parameter
+
+  try {
+      // Suche nach Benutzer anhand der ID
+      const user = await User.findByPk(userId);
+      if (!user) {
+          return res.status(404).json({ error: 'Benutzer nicht gefunden' });
+      }
+
+      // Suche nach Listen des Benutzers
+      const userLists = await List.findAll({ where: { l_user_id: userId } });
+
+      res.status(200).json({ lists: userLists });
+  } catch (error) {
+      console.error('Fehler bei getUserList:', error);
+      res.status(500).json({ error: 'Interner Serverfehler' });
+  }
+};;
 
 router.post('/register', async (req, res) => {
   const { YourName, YourEmail, Password } = req.body;
