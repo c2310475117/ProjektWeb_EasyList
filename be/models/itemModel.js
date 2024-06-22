@@ -17,7 +17,7 @@ Item.init({
         primaryKey: true
     },
     
-    list_id: {
+    i_list_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

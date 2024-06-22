@@ -31,18 +31,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(frontendPath, 'register.html'));
 });
 
-// Synchronize the database
-// Synchronize the database
-// Synchronize the database
+
+
 syncDatabase().then(() => {
-  // Einbinden der 
-  app.use('/controllerRoutes', controllerRoutes);
+
+  controllerRoutes(); // VOR DEN ROUTES !!!
+
   app.use('/user', userRoutes);
   app.use('/items', authMiddleware, checkListAccess, itemRoutes);
   app.use('/med', authMiddleware, checkListAccess, medRoutes);
-
-  // Beispiel: Verwendung der controllerRoutes
-  controllerRoutes(); // Hier werden die Beziehungen zwischen den Modellen konfiguriert
 
   // Test-Route
   app.get('/api/message', (req, res) => {

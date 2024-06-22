@@ -18,11 +18,14 @@ const Sequ = new Sequelize({
 const syncDatabase = async () => {
     try {
         await Sequ.authenticate();
-        console.log('Verbindung zur Datenbank erfolgreich hergestellt.');
+        console.log('Connection to the database has been established successfully.');
+        await Sequ.sync({ force: true }); // { force: true } !!!!
+        console.log('All models were synchronized successfully.');
     } catch (error) {
-        console.error('Fehler bei der Verbindung zur Datenbank in db.js:', error);
+        console.error('Unable to connect to the database:', error);
     }
 };
+
 
 export { Sequ, syncDatabase };
 export default Sequ;

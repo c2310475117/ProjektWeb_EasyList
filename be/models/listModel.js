@@ -23,7 +23,7 @@ List.init ({
         allowNull: false
     },
 
-    user_id: {
+    l_user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

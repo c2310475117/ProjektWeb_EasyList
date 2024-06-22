@@ -17,7 +17,7 @@ Med.init({
         primaryKey: true
     },
 
-    list_id: {
+    m_list_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

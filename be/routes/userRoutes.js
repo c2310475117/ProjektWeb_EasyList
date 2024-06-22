@@ -11,15 +11,15 @@ import { Op } from 'sequelize';
 
 const router = express.Router();
 
-const createList = async (userId, listName) => {
+const createList = async (userId) => {
   try {
     const newList = await List.create({
-      user_id: userId,
-      list_name: listName,
+      list_name: 'Default List', 
+      l_user_id: userId,
     });
     return newList;
   } catch (error) {
-    console.error('Fehler beim Erstellen der Liste:', error);
+    console.error('Error creating list:', error);
     throw error;
   }
 };
@@ -27,7 +27,7 @@ const createList = async (userId, listName) => {
 const getUserLists = async (userId) => {
   try {
     const lists = await List.findAll({
-      where: { user_id: userId }
+      where: { l_user_id: userId }
     });
     return lists;
   } catch (error) {
@@ -37,7 +37,6 @@ const getUserLists = async (userId) => {
 };
 
 
-/// Beispiel: Registrierung eines neuen Benutzers
 router.post('/register', async (req, res) => {
   const { YourName, YourEmail, Password } = req.body;
   console.log('Request body:', req.body);
@@ -46,18 +45,18 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Überprüfen, ob Benutzer bereits existiert
-    let existingUser = await User.findOne({
+    // Check if user already exists
+    const existingUser = await User.findOne({
       where: {
         [Op.or]: [{ user_name: YourName }, { email: YourEmail }]
       }
     });
 
     if (existingUser) {
-      return res.redirect('http://localhost:3001/login.html'); // Beispiel für Weiterleitung
+      return res.redirect('http://localhost:3001/login.html'); // Example for redirection
     }
 
-    // Passwort hashen und neuen Benutzer erstellen
+    // Hash the password and create new user
     const hashedPassword = await bcrypt.hash(Password, 10);
     const newUser = await User.create({
       user_name: YourName,
@@ -65,9 +64,10 @@ router.post('/register', async (req, res) => {
       password_hash: hashedPassword,
     });
 
-    const newList = await createList(newUser.user_id, 'Default List');
+    // Create default list for new user
+    const newList = await createList(newUser.user_id);
 
-    // Erfolgreiche Antwort zurückgeben
+    // Successful response
     res.status(201).json({ newUser, newList });
   } catch (error) {
     console.error('Error saving user to database:', error);
@@ -76,7 +76,7 @@ router.post('/register', async (req, res) => {
 });
 
 
-// Beispiel: Authentifizierung und Ausstellung eines JWTs
+
 router.post('/login', async (req, res) => {
   const { YourName, Password } = req.body;
   if (!YourName || !Password) {
@@ -94,59 +94,50 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Incorrect password' });
     }
 
-     // Erstellung eines JWTs mit Benutzer-ID und einem geheimen Schlüssel
-     const token = generateAccessToken(user.user_id);
+    // Generate JWT with user ID
+    const token = generateAccessToken(user.user_id);
 
-    // Erfolgreiche Antwort mit JWT zurückgeben
-    /*res.json ({
-      // 
-    })
-      */
-    res.status(200).json({ token, user_id: user.user_id, });
+    // Successful response with JWT
+    res.status(200).json({ token, user_id: user.user_id });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Route zum Abrufen der Listen eines Benutzers
 router.get('/lists', verifyToken, async (req, res) => {
   try {
-    const userId = req.user.user_id; // Benutzer-ID aus dem Token
-    const lists = await getUserLists(userId); // Funktion zum Abrufen der Listen
+    const userId = req.user.user_id; // User ID from token
+    const lists = await getUserLists(userId); // Function to get lists
 
-    res.status(200).json({ lists }); // Erfolgreiche Antwort mit den Listen des Benutzers
+    res.status(200).json({ lists }); // Successful response with user lists
   } catch (error) {
     console.error('Fehler beim Abrufen der Listen:', error);
     res.status(500).json({ error: 'Interner Serverfehler' });
   }
 });
 
+// Route to delete a user and their lists
 router.delete('/:userId', verifyToken, async (req, res) => {
-  const userIdToDelete = req.params.userId; // Die Benutzer-ID, die gelöscht werden soll
-  const requestingUserId = req.user.user_id; // Die Benutzer-ID des anfragenden Benutzers
+  const userIdToDelete = req.params.userId; // User ID to delete
+  const requestingUserId = req.user.user_id; // User ID of requesting user
 
   try {
-    // Prüfen, ob der anfragende Benutzer die Berechtigung hat, den Benutzer zu löschen
+    // Check if the requesting user has permission to delete the user
     if (requestingUserId !== userIdToDelete) {
       return res.status(403).json({ message: 'Keine Berechtigung, um den Benutzer zu löschen' });
     }
 
-    // Hier implementiere die Logik zum Löschen des Benutzers und aller zugehörigen Listen, etc.
-    // Beispiel: Benutzer löschen
+    // Find the user to delete
     const deletedUser = await User.findByPk(userIdToDelete);
 
     if (!deletedUser) {
       return res.status(404).json({ message: 'Benutzer nicht gefunden' });
     }
 
+    // Delete user and related lists
+    await List.destroy({ where: { l_user_id: userIdToDelete } });
     await deletedUser.destroy();
-
-    // Zusätzliche Logik für das Löschen von Listen, falls benötigt
-    // Beispiel: Löschen aller Listen des Benutzers
-    await List.destroy({
-      where: { user_id: userIdToDelete }
-    });
 
     res.status(200).json({ message: 'Benutzer erfolgreich gelöscht' });
   } catch (error) {
