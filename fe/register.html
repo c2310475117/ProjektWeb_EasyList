@@ -5,6 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>To-Do List</title>
   <link rel="stylesheet" href="index.css">
+  <script>
+    // Funktion zum Abrufen von URL-Parametern
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            token: params.get('token'),
+            userId: params.get('user_id')
+        };
+    }
+
+    // Speichern des Tokens im lokalen Speicher oder weitere Verarbeitung
+    window.onload = () => {
+        const { token, userId } = getQueryParams();
+        if (token) {
+            localStorage.setItem('token', token);
+            console.log('Token gespeichert:', token);
+        }
+        // Weiterverarbeitung des Tokens oder Benutzer-ID
+    };
+</script>
 </head>
 <body>
   <div class="todo-list-container">
@@ -23,8 +43,9 @@
 
     <form id="toDoForm">
       <input type="text" id="ToDoField" placeholder="Neues Element oder Medikation hinzufügen...">
-      <select id="itemType">
-        <option value="item">Item</option>
+      <label for="itemType">Typ auswählen:</label>
+        <select id="itemType" name="itemType">
+          <option value="item">Item</option>
         <option value="medication">Medication</option>
       </select>
       <button type="submit">Hinzufügen</button>
