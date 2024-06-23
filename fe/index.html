@@ -15,24 +15,24 @@
     <main class="auth-main">
       <section id="loginSection" style="display:none;">
         <h2>Login</h2>
-        <form action="http://localhost:3000/user/login" method="post">
-          <input placeholder="Username" name="YourName" type="text">
+        <form id="loginForm">
+          <input placeholder="Username" name="YourName" type="text" required>
           <br>
-          <input placeholder="Password" name="Password" type="password">
+          <input placeholder="Password" name="Password" type="password" required>
           <br>
           <input class="sub" type="submit" value="Login">
         </form>
-        <p>Don't have an account? <a href="" onclick="toggleForm('register')">Register here</a></p>
+        <p>Don't have an account? <a href="#" onclick="toggleForm('register')">Register here</a></p>
       </section>
 
       <section id="registerSection" style="display:block;">
         <h2>Register</h2>
-        <form action="http://localhost:3000/user/register" method="post">
-          <input placeholder="Username"  name="YourName" type="text">
+        <form id="registerForm">
+          <input placeholder="Username" name="YourName" type="text" required>
           <br>
-          <input placeholder="Email" name="YourEmail" type="email">
+          <input placeholder="Email" name="YourEmail" type="email" required>
           <br>
-          <input placeholder="Password" name="Password" type="password">
+          <input placeholder="Password" name="Password" type="password" required>
           <br>
           <input class="sub" type="submit" value="Register">
         </form>
@@ -54,6 +54,65 @@
         registerSection.style.display = 'block';
       }
     }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const username = event.target.YourName.value;
+      const password = event.target.Password.value;
+
+      try {
+        const response = await fetch('http://localhost:3000/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('token', data.token);
+          window.location.href = 'register.html'; // Redirect to the to-do list page after login
+        } else {
+          alert('Login failed. Please check your credentials.');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const username = event.target.YourName.value;
+      const email = event.target.YourEmail.value;
+      const password = event.target.Password.value;
+
+      try {
+        console.log('Sending registration request');
+        const response = await fetch('http://localhost:3000/user/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        if (response.ok) {
+          console.log('Registration successful');
+          const data = await response.json();
+          localStorage.setItem('token', data.token);
+          window.location.href = 'register.html'; // Redirect to the to-do list page after registration
+        } else {
+          const errorText = await response.text();
+          console.error('Registration failed:', errorText);
+          alert(`Registration failed: ${errorText}`);
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
   </script>
 </body>
 </html>

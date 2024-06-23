@@ -19,13 +19,12 @@ const syncDatabase = async () => {
     try {
         await Sequ.authenticate();
         console.log('Connection to the database has been established successfully.');
-        await Sequ.sync({ force: true }); // { force: true } !!!!
+        await Sequ.sync({ force: false }); // setze force auf false um die Daten nicht zu verlieren
         console.log('All models were synchronized successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);
     }
 };
-
 
 export { Sequ, syncDatabase };
 export default Sequ;
