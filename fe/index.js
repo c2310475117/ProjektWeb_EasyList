@@ -1,5 +1,3 @@
-// frontend/index.js
-
 class ToDoListManager {
   constructor(token, userId) {
     this.token = token;
@@ -27,11 +25,14 @@ class ToDoListManager {
 
   async fetchUserLists(userId) {
     try {
+<<<<<<< HEAD
       const headers = {
         'Authorization': `Bearer ${this.token}`,
         'Content-Type': 'application/json'
       };
 
+=======
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       const response = await fetch(`http://localhost:3000/user/lists/${userId}`, {
         method: 'GET',
         headers: headers
@@ -122,7 +123,22 @@ class ToDoListManager {
     }
   }
 
+<<<<<<< HEAD
   async createList(listName, userId) {
+=======
+  renderItems(items, type) {
+    // Logik zum Rendern der Items
+    items.forEach(item => {
+      const itemElement = this.createItemElement(item);
+      const list = document.querySelector(`[data-list-id="${item.listId}"] .item-list`);
+      if (list) {
+        list.appendChild(itemElement);
+      }
+    });
+  }
+
+  async createList(listName) {
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     try {
       const response = await fetch('http://localhost:3000/user/lists', {
         method: 'POST',
@@ -139,7 +155,13 @@ class ToDoListManager {
 
       const newList = await response.json();
       console.log('Neue Liste erstellt:', newList);
+<<<<<<< HEAD
       await this.fetchUserLists(userId);
+=======
+
+      // Nach Erstellung der Liste Benutzerlisten aktualisieren
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Erstellen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -163,7 +185,13 @@ class ToDoListManager {
 
       const newItem = await response.json();
       console.log('Neues Element hinzugefügt:', newItem);
+<<<<<<< HEAD
       await this.fetchUserLists(this.userId);
+=======
+
+      // Nach Hinzufügen des Elements Benutzerlisten aktualisieren
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -185,7 +213,12 @@ class ToDoListManager {
       }
 
       console.log('Liste erfolgreich gelöscht');
+<<<<<<< HEAD
       await this.fetchUserLists(this.userId);
+=======
+      // Nach Löschen der Liste Benutzerlisten aktualisieren
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Löschen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -208,7 +241,12 @@ class ToDoListManager {
       }
 
       console.log('Element erfolgreich gelöscht');
+<<<<<<< HEAD
       await this.fetchUserLists(this.userId);
+=======
+      // Nach Löschen des Elements Benutzerlisten aktualisieren
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Löschen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -232,7 +270,12 @@ class ToDoListManager {
 
       const newItem = await response.json();
       console.log('Neues Item hinzugefügt:', newItem);
+<<<<<<< HEAD
       await this.fetchUserLists(this.userId);
+=======
+
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Items:', error);
     }
@@ -255,13 +298,19 @@ class ToDoListManager {
 
       const newMedication = await response.json();
       console.log('Neue Medikation hinzugefügt:', newMedication);
+<<<<<<< HEAD
       await this.fetchUserLists(this.userId);
+=======
+
+      await this.fetchUserLists(localStorage.getItem('userId'));
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Medikation:', error);
     }
   }
 
   setupEventListeners() {
+<<<<<<< HEAD
     const listContainer = document.getElementById('listContainer');
     if (!listContainer) {
       console.error('Element mit ID "listContainer" nicht gefunden.');
@@ -269,6 +318,20 @@ class ToDoListManager {
     }
 
     listContainer.addEventListener('click', async (event) => {
+=======
+    document.getElementById('createListForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      console.log('createListForm submit event triggered');
+      const listNameInput = document.getElementById('listName');
+      const listName = listNameInput.value.trim();
+      if (listName !== '') {
+        await this.createList(listName);
+        listNameInput.value = '';
+      }
+    });
+
+    document.getElementById('listContainer').addEventListener('click', async (event) => {
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       const target = event.target;
 
       if (target.classList.contains('add-item-button')) {
@@ -299,6 +362,7 @@ class ToDoListManager {
       }
     });
 
+<<<<<<< HEAD
     const toDoForm = document.getElementById('toDoForm');
     if (!toDoForm) {
       console.error('Element mit ID "toDoForm" nicht gefunden.');
@@ -306,6 +370,9 @@ class ToDoListManager {
     }
 
     toDoForm.addEventListener('submit', async (event) => {
+=======
+    document.getElementById('toDoForm').addEventListener('submit', async (event) => {
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       event.preventDefault();
       console.log('toDoForm submit event triggered');
       const toDoField = document.getElementById('ToDoField');
@@ -321,6 +388,7 @@ class ToDoListManager {
         toDoField.value = '';
       }
     });
+<<<<<<< HEAD
 
     const createListForm = document.getElementById('createListForm');
     if (!createListForm) {
@@ -354,4 +422,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hier könnten Sie eine Weiterleitung zum Login oder zur Registrierung implementieren
     // oder eine entsprechende Fehlermeldung anzeigen.
   }
+=======
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new ToDoListManager();
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
 });

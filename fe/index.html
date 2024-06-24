@@ -61,8 +61,8 @@
       const password = event.target.Password.value;
 
       try {
-        console.log('Sending registration request');
-        const response = await fetch('http://localhost:3000/user/login', { // Geändert: URL zum Login-Endpunkt
+        console.log('Sending login request');
+        const response = await fetch('http://localhost:3000/user/login', { 
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -71,11 +71,11 @@
         });
 
         if (response.ok) {
-          console.log('Registration successful');
-          const data = await response.json(); // Geändert: Verarbeiten der JSON-Antwort
+          console.log('Login successful');
+          const data = await response.json(); 
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user_id);
-          window.location.href = `register.html?token=${data.token}&user_id=${data.user_id}`; // Geändert: URL mit Token und Benutzer-ID
+          window.location.href = `register.html?token=${data.token}&user_id=${data.user_id}`;
         } else {
           const errorText = await response.text();
           console.error('Login failed:', errorText);
@@ -95,7 +95,7 @@
 
       try {
         console.log('Sending registration request');
-        const response = await fetch('http://localhost:3000/user/register', { // Geändert: URL zum Registrierungs-Endpunkt
+        const response = await fetch('http://localhost:3000/user/register', { 
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -105,11 +105,11 @@
 
         if (response.ok) {
           console.log('Registration successful');
-          const data = await response.json(); // Geändert: Verarbeiten der JSON-Antwort
+          const data = await response.json(); 
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user_id);
-          window.location.href = `register.html?token=${data.token}&user_id=${data.user_id}`; // Geändert: URL mit Token und Benutzer-ID
-          } else {
+          window.location.href = `register.html?token=${data.token}&user_id=${data.user_id}`;
+        } else {
           const errorText = await response.text();
           console.error('Registration failed:', errorText);
           alert(`Registration failed: ${errorText}`);

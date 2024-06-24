@@ -17,6 +17,7 @@
 
     // Speichern des Tokens im lokalen Speicher oder weitere Verarbeitung
     window.onload = () => {
+<<<<<<< HEAD
       const { token, userId } = getQueryParams();
       if (token) {
         localStorage.setItem('token', token);
@@ -24,11 +25,31 @@
       }
       // Weiterverarbeitung des Tokens oder Benutzer-ID
     };
+=======
+        const { token, userId } = getQueryParams();
+        if (token) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('userId', userId);
+            console.log('Token und Benutzer-ID gespeichert:', token, userId);
+        }
+        // Weiterverarbeitung des Tokens oder Benutzer-ID
+    };
+
+    // Logout-Funktion
+    function logout() {
+      // Session oder Token löschen
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      // Umleiten zur Login/Register-Seite
+      window.location.href = 'index.html';
+    }
+>>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
   </script>
 </head>
 <body>
   <div class="todo-list-container">
     <header class="todo-list-header">
+      <button id="logoutButton" onclick="logout()" style="position: absolute; top: 10px; left: 10px;">Logout</button>
       <h1>To-Do List</h1>
     </header>
     <main class="todo-list-main">
