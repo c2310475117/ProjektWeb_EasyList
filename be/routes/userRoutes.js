@@ -10,10 +10,11 @@ import { controllerRoutes } from './controllerRoutes.js';
 
 const router = express.Router();
 
-const createList = async (userId) => {
+// Funktion zur Erstellung einer Liste für einen Benutzer
+const createList = async (listName, userId) => {
   try {
     const newList = await List.create({
-      list_name: 'Default List', 
+      list_name: listName,
       l_user_id: userId,
     });
     return newList;
@@ -23,23 +24,44 @@ const createList = async (userId) => {
   }
 };
 
-router.post('/lists', checkListAccess);
+router.post('/lists', authMiddleware, async (req, res) => {
+  const { ListName, } = req.body; // Name der Liste aus dem Anfragekörper
+   // Benutzer-ID aus der authentifizierten Anfrage
 
-router.get('/lists/:userId', authMiddleware, async (req, res) => {
-  const userId = req.params.userId;
+  if (!listName) {
+    return res.status(400).json({ message: 'List name is required' });
+  }
+
+  const userId = req.user.user_id;
 
   try {
-    const lists = await getUserLists(userId);
-    res.status(200).json({ lists });
+    const newList = await createList (ListName, userId);
+    console.log('Neue Liste erstellt:', newList);
+
+    res.status(201).json({ list: newList });
+  } catch (error) {
+    console.error('Fehler beim Erstellen der Liste:', error);
+    res.status(500).json({ error: 'Interner Serverfehler beim Erstellen der Liste' });
+  }
+});
+
+
+router.get('/lists/:userId', authMiddleware, async (req, res) => {
+  const userId = req.user.user_id;
+
+  try {
+    const userLists = await List.findAll({ where: { l_user_id: userId } });
+
+    res.status(200).json({ lists: userLists });
   } catch (error) {
     console.error('Fehler beim Abrufen der Listen des Benutzers:', error);
     res.status(500).json({ error: 'Interner Serverfehler beim Abrufen der Listen' });
   }
 });
 
-
+/*
 const getUserLists = async (req, res) => {
-  const userId = req.params.userId; // Benutzer-ID aus der URL-Parameter
+  const userId = req.user.user_id; // Benutzer-ID aus der URL-Parameter
   console.log("UserID aus der Anfrage:", userId);
 
   try {
@@ -58,6 +80,7 @@ const getUserLists = async (req, res) => {
       res.status(500).json({ error: 'Interner Serverfehler' });
   }
 };;
+*/
 
 // Registrierung eines neuen Benutzers
 router.post('/register', async (req, res) => {
@@ -82,12 +105,15 @@ if (existingUser) {
 
     const user = await User.create({ user_name: username, email, password_hash: hashedPassword });
 
-    const token = generateAccessToken(user.user_id);
     console.log('User created successfully:', user);
 
-    const defaultList = await createList(user.user_id);
-    
+    const ListName = "default List";
+
+    const defaultList = await createList( ListName, user.user_id);
+
     console.log('Default list created for user:', defaultList);
+
+    const token = generateAccessToken(user.user_id);
 
     res.status(201).json({ token, user_id: user.user_id }); // Geändert: Senden von JSON-Antworten statt Redirect
   } catch (error) {

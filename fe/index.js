@@ -35,7 +35,7 @@ class ToDoListManager {
 
   async fetchUserLists(UserId) {
     try {
-      const userId = localStorage.getItem('userId');
+      // const userId = localStorage.getItem('userId');
       const response = await fetch(`http://localhost:3000/user/lists/${userId}`, {
         method: 'GET',
         headers: {

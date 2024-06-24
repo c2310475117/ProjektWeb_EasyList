@@ -16,7 +16,7 @@ const verifyToken = (token) => {
 };
 
 // Middleware zur Überprüfung des Tokens
-export const authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   // Überprüfung und Extraktion des Tokens aus dem Header
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
