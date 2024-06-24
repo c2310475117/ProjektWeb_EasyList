@@ -1,5 +1,3 @@
-// frontend/index.js
-
 class ToDoListManager {
   constructor() {
     this.init();
@@ -32,10 +30,8 @@ class ToDoListManager {
     }
   }
 
-
-  async fetchUserLists(UserId) {
+  async fetchUserLists(userId) {
     try {
-      // const userId = localStorage.getItem('userId');
       const response = await fetch(`http://localhost:3000/user/lists/${userId}`, {
         method: 'GET',
         headers: {
@@ -132,6 +128,17 @@ class ToDoListManager {
     }
   }
 
+  renderItems(items, type) {
+    // Logik zum Rendern der Items
+    items.forEach(item => {
+      const itemElement = this.createItemElement(item);
+      const list = document.querySelector(`[data-list-id="${item.listId}"] .item-list`);
+      if (list) {
+        list.appendChild(itemElement);
+      }
+    });
+  }
+
   async createList(listName) {
     try {
       const response = await fetch('http://localhost:3000/lists', {
@@ -151,7 +158,7 @@ class ToDoListManager {
       console.log('Neue Liste erstellt:', newList);
 
       // Nach Erstellung der Liste Benutzerlisten aktualisieren
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Erstellen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -177,7 +184,7 @@ class ToDoListManager {
       console.log('Neues Element hinzugefügt:', newItem);
 
       // Nach Hinzufügen des Elements Benutzerlisten aktualisieren
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -200,7 +207,7 @@ class ToDoListManager {
 
       console.log('Liste erfolgreich gelöscht');
       // Nach Löschen der Liste Benutzerlisten aktualisieren
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Löschen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -224,7 +231,7 @@ class ToDoListManager {
 
       console.log('Element erfolgreich gelöscht');
       // Nach Löschen des Elements Benutzerlisten aktualisieren
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Löschen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -249,7 +256,7 @@ class ToDoListManager {
       const newItem = await response.json();
       console.log('Neues Item hinzugefügt:', newItem);
 
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Items:', error);
     }
@@ -273,7 +280,7 @@ class ToDoListManager {
       const newMedication = await response.json();
       console.log('Neue Medikation hinzugefügt:', newMedication);
 
-      await this.fetchUserLists(UserId);
+      await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Medikation:', error);
     }
@@ -290,10 +297,10 @@ class ToDoListManager {
         listNameInput.value = '';
       }
     });
-  
+
     document.getElementById('listContainer').addEventListener('click', async (event) => {
       const target = event.target;
-  
+
       if (target.classList.contains('add-item-button')) {
         console.log('add-item-button clicked');
         const listElement = target.closest('.user-list');
@@ -305,14 +312,14 @@ class ToDoListManager {
           itemInput.value = '';
         }
       }
-  
+
       if (target.classList.contains('delete-list-button')) {
         console.log('delete-list-button clicked');
         const listElement = target.closest('.user-list');
         const listId = listElement.dataset.listId;
         await this.deleteList(listId);
       }
-  
+
       if (target.classList.contains('delete-item-button')) {
         console.log('delete-item-button clicked');
         const itemElement = target.closest('.todo-list-item');
@@ -321,14 +328,14 @@ class ToDoListManager {
         await this.deleteItem(itemId, itemType);
       }
     });
-  
+
     document.getElementById('toDoForm').addEventListener('submit', async (event) => {
       event.preventDefault();
       console.log('toDoForm submit event triggered');
       const toDoField = document.getElementById('ToDoField');
       const keyword = toDoField.value.trim();
       const itemType = document.getElementById('itemType').value;
-  
+
       if (keyword !== '') {
         if (itemType === 'item') {
           await this.addNewItem(keyword);
@@ -338,8 +345,9 @@ class ToDoListManager {
         toDoField.value = '';
       }
     });
-  }}
+  }
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    new ToDoListManager();
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  new ToDoListManager();
+});
