@@ -1,18 +1,14 @@
 //!-- backend/models/listModel.js -->
 
-
-import { Model, DataTypes} from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import Sequ from '../db.js';
-
 import User from './userModel.js';
 
-// Definition des Items-Modells
 class List extends Model {}
 
 // Definition des Listen-Modells
-List.init ({
-   list_id: {
+List.init({
+    list_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
@@ -27,8 +23,8 @@ List.init ({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: User, 
-            key: 'user_id'
+            model: User,
+            key: 'id' // korrekte Referenz zum Primärschlüssel des Usermodells
         }
     },
 
@@ -40,10 +36,9 @@ List.init ({
 }, {
     sequelize: Sequ,
     modelName: 'List',
-    tableName: 'lists', 
-    timestamps: true,
-    underscored: true 
+    tableName: 'lists',
+    timestamps: true, // aktiviert die integrierten Felder createdAt und updatedAt
+    underscored: true
 });
 
 export default List;
-

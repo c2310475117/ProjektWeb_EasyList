@@ -8,49 +8,30 @@
   <script>
     // Funktion zum Abrufen von URL-Parametern
     function getQueryParams() {
-      const params = new URLSearchParams(window.location.search);
-      return {
-        token: params.get('token'),
-        userId: params.get('user_id')
-      };
+        const params = new URLSearchParams(window.location.search);
+        return {
+            token: params.get('token'),
+            userId: params.get('user_id')
+        };
     }
 
     // Speichern des Tokens im lokalen Speicher oder weitere Verarbeitung
     window.onload = () => {
-<<<<<<< HEAD
-      const { token, userId } = getQueryParams();
-      if (token) {
-        localStorage.setItem('token', token);
-        console.log('Token gespeichert:', token);
-      }
-      // Weiterverarbeitung des Tokens oder Benutzer-ID
-    };
-=======
         const { token, userId } = getQueryParams();
-        if (token) {
+        if (token && userId) {
             localStorage.setItem('token', token);
             localStorage.setItem('userId', userId);
             console.log('Token und Benutzer-ID gespeichert:', token, userId);
         }
         // Weiterverarbeitung des Tokens oder Benutzer-ID
     };
-
-    // Logout-Funktion
-    function logout() {
-      // Session oder Token löschen
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      // Umleiten zur Login/Register-Seite
-      window.location.href = 'index.html';
-    }
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
   </script>
 </head>
 <body>
   <div class="todo-list-container">
     <header class="todo-list-header">
-      <button id="logoutButton" onclick="logout()" style="position: absolute; top: 10px; left: 10px;">Logout</button>
       <h1>To-Do List</h1>
+      <button onclick="logout()" id="logoutButton">Logout</button>
     </header>
     <main class="todo-list-main">
       <div class="page-content">
@@ -61,17 +42,23 @@
         <div id="listContainer"></div>
       </div>
     </main>
-
     <form id="toDoForm">
       <input type="text" id="ToDoField" placeholder="Neues Element oder Medikation hinzufügen...">
       <label for="itemType">Typ auswählen:</label>
-      <select id="itemType" name="itemType">
-        <option value="item">Item</option>
+        <select id="itemType" name="itemType">
+          <option value="item">Item</option>
         <option value="medication">Medication</option>
       </select>
       <button type="submit">Hinzufügen</button>
     </form>
   </div>
+  <script>
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      window.location.href = 'index.html';
+    }
+  </script>
   <script src="index.js" type="module"></script>
 </body>
 </html>

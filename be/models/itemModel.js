@@ -1,28 +1,25 @@
 //!-- backend/models/itemModel.js -->
 
-
-import { Model, DataTypes} from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import Sequ from '../db.js';
-
 import List from './listModel.js';
 
 // Definition des Items-Modells
 class Item extends Model {}
 
 Item.init({
-    idem_id: {
+    item_id: { // korrigiert von idem_id zu item_id
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     
-    i_list_id: {
+    i_list_id: { // Fremdschlüssel zum Listenmodell
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: List,
-            key: 'list_id'
+            key: 'id' // korrekte Referenz zum Primärschlüssel des Listenmodells
         }
     },
     
@@ -54,5 +51,3 @@ Item.init({
 });
 
 export default Item;
-
-

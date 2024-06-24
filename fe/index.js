@@ -1,21 +1,26 @@
+// frontend/index.js
+
 class ToDoListManager {
-  constructor(token, userId) {
-    this.token = token;
-    this.userId = userId;
+  constructor() {
     this.init();
   }
 
   async init() {
-    if (!this.token || !this.userId) {
+    // Überprüfen, ob der Benutzer authentifiziert ist
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!token || !userId) {
       console.error('Benutzer nicht authentifiziert.');
       // Hier sollte eine Behandlung für nicht authentifizierte Benutzer erfolgen
       return;
     }
 
     try {
-      await this.fetchUserLists(this.userId);
-      await this.fetchItems('item');
-      await this.fetchItems('medication');
+      // Laden der Listen des Benutzers
+      await this.fetchUserLists(userId);
+
+      // Event Listener einrichten
       this.setupEventListeners();
     } catch (error) {
       console.error('Fehler bei der Initialisierung:', error);
@@ -25,17 +30,12 @@ class ToDoListManager {
 
   async fetchUserLists(userId) {
     try {
-<<<<<<< HEAD
-      const headers = {
-        'Authorization': `Bearer ${this.token}`,
-        'Content-Type': 'application/json'
-      };
-
-=======
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       const response = await fetch(`http://localhost:3000/user/lists/${userId}`, {
         method: 'GET',
-        headers: headers
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       if (!response.ok) {
@@ -44,6 +44,8 @@ class ToDoListManager {
 
       const data = await response.json();
       console.log('Benutzerlisten:', data.lists);
+
+      // Benutzerlisten in der UI rendern
       this.renderUserLists(data.lists);
     } catch (error) {
       console.error('Fehler beim Abrufen der Benutzerlisten:', error);
@@ -70,42 +72,18 @@ class ToDoListManager {
       `;
 
       const itemList = listElement.querySelector('.item-list');
-      list.items.forEach(item => {
-        const itemElement = this.createItemElement(item);
-        itemList.appendChild(itemElement);
-      });
+      this.fetchItems(list.list_id, itemList);
 
       listContainer.appendChild(listElement);
     });
   }
 
-  createItemElement(item) {
-    const itemElement = document.createElement('li');
-    itemElement.className = 'todo-list-item';
-    itemElement.dataset.itemId = item.item_id;
-    itemElement.innerHTML = `
-      <div class="item-content">
-        <div class="title">${item.item_title}</div>
-        <div class="id">ID: ${item.item_id}</div>
-        <button class="delete-item-button">Löschen</button>
-      </div>
-    `;
-    return itemElement;
-  }
-
-  async fetchItems(type) {
+  async fetchItems(listId, itemList) {
     try {
-      let endpoint;
-      if (type === 'medication') {
-        endpoint = 'http://localhost:3000/med';
-      } else if (type === 'item') {
-        endpoint = 'http://localhost:3000/items';
-      }
-
-      const response = await fetch(endpoint, {
+      const response = await fetch(`http://localhost:3000/items?list_id=${listId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         }
       });
@@ -115,38 +93,41 @@ class ToDoListManager {
       }
 
       const data = await response.json();
-      console.log(`Geladene ${type}:`, data);
-      this.renderItems(data, type);
+      console.log(`Geladene Items für Liste ${listId}:`, data);
+
+      data.forEach(item => {
+        const itemElement = this.createItemElement(item);
+        itemList.appendChild(itemElement);
+      });
     } catch (error) {
       console.error('Fehler beim Abrufen der Elemente:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
     }
   }
 
-<<<<<<< HEAD
-  async createList(listName, userId) {
-=======
-  renderItems(items, type) {
-    // Logik zum Rendern der Items
-    items.forEach(item => {
-      const itemElement = this.createItemElement(item);
-      const list = document.querySelector(`[data-list-id="${item.listId}"] .item-list`);
-      if (list) {
-        list.appendChild(itemElement);
-      }
-    });
+  createItemElement(item) {
+    const itemElement = document.createElement('li');
+    itemElement.className = 'todo-list-item';
+    itemElement.dataset.itemId = item.id;
+    itemElement.innerHTML = `
+      <div class="item-content">
+        <div class="title">${item.item_title_en}</div>
+        <div class="id">ID: ${item.id}</div>
+        <button class="delete-item-button">Löschen</button>
+      </div>
+    `;
+    return itemElement;
   }
 
   async createList(listName) {
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     try {
       const response = await fetch('http://localhost:3000/user/lists', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ listName, userId })
+        body: JSON.stringify({ listName })
       });
 
       if (!response.ok) {
@@ -155,13 +136,9 @@ class ToDoListManager {
 
       const newList = await response.json();
       console.log('Neue Liste erstellt:', newList);
-<<<<<<< HEAD
-      await this.fetchUserLists(userId);
-=======
 
       // Nach Erstellung der Liste Benutzerlisten aktualisieren
       await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Erstellen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -170,13 +147,13 @@ class ToDoListManager {
 
   async addItemToList(listId, itemTitle) {
     try {
-      const response = await fetch(`http://localhost:3000/items/${listId}`, {
+      const response = await fetch(`http://localhost:3000/items`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ item_name: itemTitle })
+        body: JSON.stringify({ keyword: itemTitle, userId: localStorage.getItem('userId') })
       });
 
       if (!response.ok) {
@@ -185,13 +162,9 @@ class ToDoListManager {
 
       const newItem = await response.json();
       console.log('Neues Element hinzugefügt:', newItem);
-<<<<<<< HEAD
-      await this.fetchUserLists(this.userId);
-=======
 
       // Nach Hinzufügen des Elements Benutzerlisten aktualisieren
       await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -200,38 +173,34 @@ class ToDoListManager {
 
   async deleteList(listId) {
     try {
-      const response = await fetch(`http://localhost:3000/user/${listId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
+        const response = await fetch(`http://localhost:3000/lists/${listId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
         }
-      });
 
-      if (!response.ok) {
-        throw new Error('Netzwerkantwort war nicht ok');
-      }
-
-      console.log('Liste erfolgreich gelöscht');
-<<<<<<< HEAD
-      await this.fetchUserLists(this.userId);
-=======
-      // Nach Löschen der Liste Benutzerlisten aktualisieren
-      await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
+        console.log('Liste erfolgreich gelöscht');
+        // Nach Löschen der Liste Benutzerlisten aktualisieren
+        await this.fetchUserLists();
     } catch (error) {
-      console.error('Fehler beim Löschen der Liste:', error);
-      // Hier sollte eine Fehlerbehandlung erfolgen
+        console.error('Fehler beim Löschen der Liste:', error);
+        // Hier sollte eine Fehlerbehandlung erfolgen
     }
-  }
+}
 
-  async deleteItem(itemId, type) {
+
+  async deleteItem(itemId) {
     try {
-      const endpoint = type === 'medication' ? `http://localhost:3000/med/${itemId}` : `http://localhost:3000/items/${itemId}`;
-      const response = await fetch(endpoint, {
+      const response = await fetch(`http://localhost:3000/items/${itemId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${this.token}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
         }
       });
@@ -241,84 +210,15 @@ class ToDoListManager {
       }
 
       console.log('Element erfolgreich gelöscht');
-<<<<<<< HEAD
-      await this.fetchUserLists(this.userId);
-=======
       // Nach Löschen des Elements Benutzerlisten aktualisieren
       await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
     } catch (error) {
       console.error('Fehler beim Löschen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
     }
   }
 
-  async addNewItem(keyword) {
-    try {
-      const response = await fetch('http://localhost:3000/items', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ keyword })
-      });
-
-      if (!response.ok) {
-        throw new Error('Netzwerkantwort war nicht ok');
-      }
-
-      const newItem = await response.json();
-      console.log('Neues Item hinzugefügt:', newItem);
-<<<<<<< HEAD
-      await this.fetchUserLists(this.userId);
-=======
-
-      await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen des Items:', error);
-    }
-  }
-
-  async addNewMedication(keyword) {
-    try {
-      const response = await fetch('http://localhost:3000/med', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ keyword })
-      });
-
-      if (!response.ok) {
-        throw new Error('Netzwerkantwort war nicht ok');
-      }
-
-      const newMedication = await response.json();
-      console.log('Neue Medikation hinzugefügt:', newMedication);
-<<<<<<< HEAD
-      await this.fetchUserLists(this.userId);
-=======
-
-      await this.fetchUserLists(localStorage.getItem('userId'));
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
-    } catch (error) {
-      console.error('Fehler beim Hinzufügen der Medikation:', error);
-    }
-  }
-
   setupEventListeners() {
-<<<<<<< HEAD
-    const listContainer = document.getElementById('listContainer');
-    if (!listContainer) {
-      console.error('Element mit ID "listContainer" nicht gefunden.');
-      return;
-    }
-
-    listContainer.addEventListener('click', async (event) => {
-=======
     document.getElementById('createListForm').addEventListener('submit', async (event) => {
       event.preventDefault();
       console.log('createListForm submit event triggered');
@@ -329,11 +229,10 @@ class ToDoListManager {
         listNameInput.value = '';
       }
     });
-
+  
     document.getElementById('listContainer').addEventListener('click', async (event) => {
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       const target = event.target;
-
+  
       if (target.classList.contains('add-item-button')) {
         console.log('add-item-button clicked');
         const listElement = target.closest('.user-list');
@@ -345,40 +244,29 @@ class ToDoListManager {
           itemInput.value = '';
         }
       }
-
+  
       if (target.classList.contains('delete-list-button')) {
         console.log('delete-list-button clicked');
         const listElement = target.closest('.user-list');
         const listId = listElement.dataset.listId;
         await this.deleteList(listId);
       }
-
+  
       if (target.classList.contains('delete-item-button')) {
         console.log('delete-item-button clicked');
         const itemElement = target.closest('.todo-list-item');
         const itemId = itemElement.dataset.itemId;
-        const itemType = itemElement.querySelector('.title-en') ? 'item' : 'medication';
-        await this.deleteItem(itemId, itemType);
+        await this.deleteItem(itemId);
       }
     });
-
-<<<<<<< HEAD
-    const toDoForm = document.getElementById('toDoForm');
-    if (!toDoForm) {
-      console.error('Element mit ID "toDoForm" nicht gefunden.');
-      return;
-    }
-
-    toDoForm.addEventListener('submit', async (event) => {
-=======
+  
     document.getElementById('toDoForm').addEventListener('submit', async (event) => {
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
       event.preventDefault();
       console.log('toDoForm submit event triggered');
       const toDoField = document.getElementById('ToDoField');
       const keyword = toDoField.value.trim();
       const itemType = document.getElementById('itemType').value;
-
+  
       if (keyword !== '') {
         if (itemType === 'item') {
           await this.addNewItem(keyword);
@@ -388,45 +276,9 @@ class ToDoListManager {
         toDoField.value = '';
       }
     });
-<<<<<<< HEAD
-
-    const createListForm = document.getElementById('createListForm');
-    if (!createListForm) {
-      console.error('Element mit ID "createListForm" nicht gefunden.');
-      return;
-    }
-
-    createListForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const listNameInput = document.getElementById('listName');
-      const listName = listNameInput.value.trim();
-
-      if (listName !== '') {
-        await this.createList(listName, this.userId);
-        listNameInput.value = '';
-      }
-    });
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Hier müssten Sie den Token und die UserId aus dem localStorage laden oder anderweitig setzen
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token') || localStorage.getItem('token');
-  const userId = urlParams.get('user_id') || localStorage.getItem('userId');
-
-  if (token && userId) {
-    new ToDoListManager(token, userId);
-  } else {
-    console.error('Token oder Benutzer-ID fehlen.');
-    // Hier könnten Sie eine Weiterleitung zum Login oder zur Registrierung implementieren
-    // oder eine entsprechende Fehlermeldung anzeigen.
-  }
-=======
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   new ToDoListManager();
->>>>>>> 8b415845d1534cbce70f106d7c4c2ba49f038b95
 });

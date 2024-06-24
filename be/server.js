@@ -1,6 +1,6 @@
- // backend/server.js
- 
- import express from 'express';
+// backend/server.js
+
+import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cors from 'cors';
@@ -53,8 +53,8 @@ syncDatabase().then(() => {
 
   // Define additional routes
   app.use('/user', userRoutes);
-  app.use('/items', authMiddleware, checkListAccess, itemRoutes);
-  app.use('/med', authMiddleware, checkListAccess, medRoutes);
+  app.use('/items', authMiddleware, itemRoutes);  // Removed checkListAccess here
+  app.use('/med', authMiddleware, medRoutes);    // Removed checkListAccess here
 
   // Test route to verify server is running
   app.get('/api/message', (req, res) => {

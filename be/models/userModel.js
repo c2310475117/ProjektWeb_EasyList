@@ -1,11 +1,9 @@
-//!-- backend/models/listModel.js -->
+//!-- backend/models/userModel.js -->
 
-import { Model, DataTypes} from 'sequelize';
-
+import { Model, DataTypes } from 'sequelize';
 import Sequ from '../db.js';
 
-
-// Definition des Medications-Modells
+// Definition des User-Modells
 class User extends Model {}
 
 User.init({
@@ -30,6 +28,16 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
+    },
+
+    created_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    },
+
+    updated_at: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     }
 
 }, {
@@ -41,5 +49,3 @@ User.init({
 });
 
 export default User;
-
-

@@ -1,10 +1,7 @@
 // backend/models/medModel.js
 
-
 import { Model, DataTypes } from 'sequelize';
-
 import Sequ from '../db.js';
-
 import List from './listModel.js';
 
 // Definition des Medications-Modells
@@ -40,7 +37,7 @@ Med.init({
     sequelize: Sequ, 
     modelName: 'Med',
     tableName: 'meds', 
-    timestamps: false,
+    timestamps: false, // Beibehaltung, wenn Sie keine `createdAt` und `updatedAt` Felder wünschen
     underscored: true
 });
 

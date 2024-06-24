@@ -15,7 +15,6 @@ const createList = async (listName, userId) => {
     const newList = await List.create({
       list_name: listName,
       l_user_id: userId,
-
     });
     return newList;
   } catch (error) {
@@ -31,7 +30,6 @@ router.post('/lists', authMiddleware, async (req, res) => {
   try {
     // Hier erfolgt die Erstellung der Liste in der Datenbank
     const newList = await createList(listName, userId);
-
     res.status(201).json(newList);
   } catch (error) {
     console.error('Fehler beim Erstellen der Liste:', error);
@@ -44,11 +42,30 @@ router.get('/lists/:userId', authMiddleware, async (req, res) => {
 
   try {
     const userLists = await List.findAll({ where: { l_user_id: userId } });
-
     res.status(200).json({ lists: userLists });
   } catch (error) {
     console.error('Fehler beim Abrufen der Listen des Benutzers:', error);
     res.status(500).json({ error: 'Interner Serverfehler beim Abrufen der Listen' });
+  }
+});
+
+// Route zum Löschen einer Liste
+router.delete('/lists/:listId', authMiddleware, async (req, res) => {
+  const listId = req.params.listId;
+  const userId = req.user.userId; // Benutzer-ID aus dem Token
+
+  try {
+    const list = await List.findOne({ where: { list_id: listId, l_user_id: userId } });
+
+    if (!list) {
+      return res.status(404).json({ message: 'Liste nicht gefunden' });
+    }
+
+    await list.destroy();
+    res.status(204).json({ message: 'Liste erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('Fehler beim Löschen der Liste:', error);
+    res.status(500).json({ error: 'Interner Serverfehler beim Löschen der Liste' });
   }
 });
 
@@ -76,9 +93,7 @@ router.post('/register', async (req, res) => {
     console.log('User created successfully:', user);
 
     const listName = "default List";
-
     const defaultList = await createList(listName, user.user_id);
-
     console.log('Default list created for user:', defaultList);
 
     const token = generateAccessToken(user.user_id);
@@ -116,7 +131,7 @@ router.post('/login', async (req, res) => {
 // Benutzer löschen
 router.delete('/:userId', verifyToken, authMiddleware, async (req, res) => {
   const userIdToDelete = req.params.userId; // User ID to delete
-  const requestingUserId = req.user.user_id; // User ID of requesting user
+  const requestingUserId = req.user.userId; // User ID of requesting user
 
   try {
     if (requestingUserId !== userIdToDelete) {
