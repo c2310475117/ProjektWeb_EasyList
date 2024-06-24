@@ -8,7 +8,9 @@ class ToDoListManager {
   async init() {
     // Überprüfen, ob der Benutzer authentifiziert ist
     const token = localStorage.getItem('token');
-    if (!token) {
+    const userId = localStorage.getItem('userId');
+
+    if (!token || !userId) {
       console.error('Benutzer nicht authentifiziert.');
       // Hier sollte eine Behandlung für nicht authentifizierte Benutzer erfolgen
       return;
@@ -16,7 +18,7 @@ class ToDoListManager {
 
     try {
       // Laden der Listen des Benutzers
-      await this.fetchUserLists();
+      await this.fetchUserLists(userId);
 
       // Laden der Standard-Elemente für den Benutzer
       await this.fetchItems('item'); // Normale Elemente laden
@@ -30,7 +32,8 @@ class ToDoListManager {
     }
   }
 
-  async fetchUserLists() {
+
+  async fetchUserLists(UserId) {
     try {
       const userId = localStorage.getItem('userId');
       const response = await fetch(`http://localhost:3000/user/lists/${userId}`, {
@@ -148,7 +151,7 @@ class ToDoListManager {
       console.log('Neue Liste erstellt:', newList);
 
       // Nach Erstellung der Liste Benutzerlisten aktualisieren
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Erstellen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -174,7 +177,7 @@ class ToDoListManager {
       console.log('Neues Element hinzugefügt:', newItem);
 
       // Nach Hinzufügen des Elements Benutzerlisten aktualisieren
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -197,7 +200,7 @@ class ToDoListManager {
 
       console.log('Liste erfolgreich gelöscht');
       // Nach Löschen der Liste Benutzerlisten aktualisieren
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Löschen der Liste:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -221,7 +224,7 @@ class ToDoListManager {
 
       console.log('Element erfolgreich gelöscht');
       // Nach Löschen des Elements Benutzerlisten aktualisieren
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Löschen des Elements:', error);
       // Hier sollte eine Fehlerbehandlung erfolgen
@@ -246,7 +249,7 @@ class ToDoListManager {
       const newItem = await response.json();
       console.log('Neues Item hinzugefügt:', newItem);
 
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Hinzufügen des Items:', error);
     }
@@ -270,7 +273,7 @@ class ToDoListManager {
       const newMedication = await response.json();
       console.log('Neue Medikation hinzugefügt:', newMedication);
 
-      await this.fetchUserLists();
+      await this.fetchUserLists(UserId);
     } catch (error) {
       console.error('Fehler beim Hinzufügen der Medikation:', error);
     }

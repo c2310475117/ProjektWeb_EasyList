@@ -4,7 +4,7 @@ import express from 'express';
 import User from '../models/userModel.js';
 import List from '../models/listModel.js'
 import bcrypt from 'bcrypt';
-import { generateAccessToken, checkListAccess, verifyToken } from '../auth.js';
+import { generateAccessToken, checkListAccess, verifyToken, authMiddleware } from '../auth.js';
 import { Op } from 'sequelize';
 import { controllerRoutes } from './controllerRoutes.js';
 
@@ -25,7 +25,7 @@ const createList = async (userId) => {
 
 router.post('/lists', checkListAccess);
 
-router.get('/lists/:userId', async (req, res) => {
+router.get('/lists/:userId', authMiddleware, async (req, res) => {
   const userId = req.params.userId;
 
   try {
@@ -37,8 +37,10 @@ router.get('/lists/:userId', async (req, res) => {
   }
 });
 
+
 const getUserLists = async (req, res) => {
   const userId = req.params.userId; // Benutzer-ID aus der URL-Parameter
+  console.log("UserID aus der Anfrage:", userId);
 
   try {
       // Suche nach Benutzer anhand der ID
@@ -48,7 +50,7 @@ const getUserLists = async (req, res) => {
       }
 
       // Suche nach Listen des Benutzers
-      const userLists = await List.findAll({ where: { l_user_id: userId } });
+      const userLists = await List.findAll({ where: { l_user_id: user.user_id } });
 
       res.status(200).json({ lists: userLists });
   } catch (error) {
@@ -84,6 +86,7 @@ if (existingUser) {
     console.log('User created successfully:', user);
 
     const defaultList = await createList(user.user_id);
+    
     console.log('Default list created for user:', defaultList);
 
     res.status(201).json({ token, user_id: user.user_id }); // Geändert: Senden von JSON-Antworten statt Redirect
@@ -117,7 +120,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.delete('/:userId', verifyToken, async (req, res) => {
+router.delete('/:userId', verifyToken, authMiddleware, async (req, res) => {
   const userIdToDelete = req.params.userId; // User ID to delete
   const requestingUserId = req.user.user_id; // User ID of requesting user
 

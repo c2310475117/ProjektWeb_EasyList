@@ -16,40 +16,34 @@ const verifyToken = (token) => {
 };
 
 // Middleware zur Überprüfung des Tokens
-const authMiddleware = async (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
+  // Überprüfung und Extraktion des Tokens aus dem Header
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Authorization header missing' });
+  }
+
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Authentifizierungs-Token fehlt.' });
-    }
-
-    const token = authHeader.split(' ')[1]; // JWT im Authorization Header
-
-    if (!token) {
-      return res.status(401).json({ message: 'Authentifizierungs-Token fehlt.' });
-    }
-
-    const decoded = verifyToken(token); // Token verifizieren
-
-    // Benutzer aus der Datenbank anhand der ID im Token abrufen und zum Request hinzufügen
-    const user = await User.findByPk(decoded.userId);
-
-    if (!user) {
-      return res.status(401).json({ message: 'Ungültiger Token.' });
-    }
-
-    req.user = user; // Füge den Benutzer dem Request hinzu
+    // Überprüfung des Tokens und Extraktion der Nutzerdaten
+    const decoded = verifyToken(token);
+    req.user = decoded; // Speichern der Nutzerdaten im Request-Objekt
     next();
   } catch (error) {
-    console.error('Authentifizierungsfehler:', error);
-    return res.status(401).json({ message: 'Authentifizierung fehlgeschlagen.' });
+    console.error('Authorization error:', error);
+    return res.status(403).json({ message: 'Unauthorized access' });
   }
-};
+}
 
 const checkListAccess = async (req, res, next) => {
   try {
-    const listName = req.params.list_name; // Annahme: Liste wird über Namen übergeben
-    const userId = req.user.id; // ID des authentifizierten Benutzers
+
+    const listName = req.params.list_name; // Listennamen aus den Request-Parametern extrahieren
+    const userId = req.user.user_id; // ID des authentifizierten Benutzers aus req.user e
+
+    console.log("UserID:", userId);
+    console.log("ListID:", listName);
 
     // Überprüfen, ob der Benutzer Zugriff auf die Liste hat
     const list = await List.findOne({ where: { list_name: listName, user_id: userId } }); // Annahme: List-Modell mit findOne
