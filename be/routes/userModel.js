@@ -1,3 +1,4 @@
+/*
 import { DataTypes } from 'sequelize';
 import Sequ from '../db.js';
 
@@ -19,3 +20,4 @@ const User = Sequ.define('User', {
 });
 
 export default User;
+*/

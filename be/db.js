@@ -1,3 +1,5 @@
+// backend/db.js
+
 import { Sequelize } from 'sequelize';
 import { fileURLToPath } from 'url';
 import path from 'path';

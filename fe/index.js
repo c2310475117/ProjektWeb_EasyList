@@ -336,3 +336,7 @@ class ToDoListManager {
       }
     });
   }}
+
+  document.addEventListener('DOMContentLoaded', () => {
+    new ToDoListManager();
+  });
