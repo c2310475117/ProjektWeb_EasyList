@@ -1,5 +1,3 @@
-// frontend/index.js
-
 class ToDoListManager {
   constructor() {
     this.init();
@@ -173,7 +171,7 @@ class ToDoListManager {
 
   async deleteList(listId) {
     try {
-        const response = await fetch(`http://localhost:3000/lists/${listId}`, {
+        const response = await fetch(`http://localhost:3000/user/lists/${listId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -187,7 +185,7 @@ class ToDoListManager {
 
         console.log('Liste erfolgreich gelöscht');
         // Nach Löschen der Liste Benutzerlisten aktualisieren
-        await this.fetchUserLists();
+        await this.fetchUserLists(localStorage.getItem('userId'));
     } catch (error) {
         console.error('Fehler beim Löschen der Liste:', error);
         // Hier sollte eine Fehlerbehandlung erfolgen
@@ -269,9 +267,9 @@ class ToDoListManager {
   
       if (keyword !== '') {
         if (itemType === 'item') {
-          await this.addNewItem(keyword);
+          await this.addItemToList(keyword);
         } else if (itemType === 'medication') {
-          await this.addNewMedication(keyword);
+          await this.addItemToList(keyword);
         }
         toDoField.value = '';
       }
