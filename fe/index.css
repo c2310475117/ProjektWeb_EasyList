@@ -1,36 +1,92 @@
+/* Allgemeine Stile */
 body {
-  font-family: Arial, sans-serif;
-  margin-top: 50px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #fafafa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
 
 h1 {
   text-align: center;
+  font-weight: 300;
+  color: #262626;
 }
 
-.todo-item-content {
-  /* Stildefinitionen für den Inhalt eines To-Do-Listenelements */
-  border: 1px solid #ccc; /* Beispiel für eine Randfarbe und -stil */
-  padding: 10px; /* Beispiel für Innenabstand */
-  margin-bottom: 10px; /* Beispiel für Außenabstand nach unten */
-  background-color: #f9f9f9; /* Beispiel für Hintergrundfarbe */
+button {
+  background-color: #0095f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
 }
 
-.todo-list {
-  /* Stildefinitionen für die gesamte ToDo-Liste */
+button:hover {
+  background-color: #007bb5;
 }
 
-.todo-list li {
-  /* Stildefinitionen für einzelne ToDo-Listenelemente */
+/* Container-Stile */
+.auth-container {
+  background-color: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-.todo-list input[type="text"] {
-  font-family: Arial, sans-serif;
-  font-size: 16px; /* Beispiel für die Schriftgröße */
-  color: #333; /* Beispiel für die Textfarbe */
+.auth-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-main form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-main input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.auth-main input:focus {
+  border-color: #0095f6;
+  outline: none;
+}
+
+.auth-main input.sub {
+  width: 100%;
   text-align: center;
 }
-  /* Stildefinitionen für das Eingabefeld */
 
-.todo-list button {
-  /* Stildefinitionen für die Schaltfläche */
+.auth-main p {
+  text-align: center;
+  color: #8e8e8e;
+}
+
+.auth-main a {
+  color: #0095f6;
+  text-decoration: none;
+}
+
+.auth-main a:hover {
+  text-decoration: underline;
 }

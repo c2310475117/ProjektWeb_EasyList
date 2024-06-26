@@ -1,5 +1,3 @@
-// backend/routes/userRoutes.js
-
 import express from 'express';
 import User from '../models/userModel.js';
 import List from '../models/listModel.js';
@@ -25,10 +23,9 @@ const createList = async (listName, userId) => {
 
 router.post('/lists', authMiddleware, async (req, res) => {
   const { listName } = req.body;
-  const userId = req.user.userId; // Benutzer-ID aus dem Token
+  const userId = req.user.userId;
 
   try {
-    // Hier erfolgt die Erstellung der Liste in der Datenbank
     const newList = await createList(listName, userId);
     res.status(201).json(newList);
   } catch (error) {
@@ -52,7 +49,7 @@ router.get('/lists/:userId', authMiddleware, async (req, res) => {
 // Route zum Löschen einer Liste
 router.delete('/lists/:listId', authMiddleware, async (req, res) => {
   const listId = req.params.listId;
-  const userId = req.user.userId; // Benutzer-ID aus dem Token
+  const userId = req.user.userId;
 
   try {
     const list = await List.findOne({ where: { list_id: listId, l_user_id: userId } });
@@ -70,12 +67,10 @@ router.delete('/lists/:listId', authMiddleware, async (req, res) => {
 });
 
 // Registrierung eines neuen Benutzers
-router.post('/register', async (req, res) => {
+router.post('/todo', async (req, res) => {
   const { username, email, password } = req.body;
-  console.log('Request body:', req.body);
 
   if (!username || !email || !password) {
-    console.log('Missing fields during registration');
     return res.status(400).json({ message: 'Name, Email, and Password are required' });
   }
 
@@ -86,19 +81,14 @@ router.post('/register', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('Creating user:', { username, email });
-
     const user = await User.create({ user_name: username, email, password_hash: hashedPassword });
-
-    console.log('User created successfully:', user);
 
     const listName = "default List";
     const defaultList = await createList(listName, user.user_id);
-    console.log('Default list created for user:', defaultList);
 
     const token = generateAccessToken(user.user_id);
 
-    res.status(201).json({ token, l_user_id: user.user_id, defaultList }); // Geändert: Senden von JSON-Antworten statt Redirect
+    res.status(201).json({ token, user_id: user.user_id, defaultList });
   } catch (error) {
     console.error('Error during registration:', error);
     res.status(500).json({ message: 'Internal server error', error: error.errors ? error.errors[0].message : error.message });
@@ -121,7 +111,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = generateAccessToken(user.user_id);
-    res.status(200).json({ token, user_id: user.user_id }); // Geändert: Senden von JSON-Antworten statt Redirect
+    res.status(200).json({ token, user_id: user.user_id });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -130,8 +120,8 @@ router.post('/login', async (req, res) => {
 
 // Benutzer löschen
 router.delete('/:userId', verifyToken, authMiddleware, async (req, res) => {
-  const userIdToDelete = req.params.userId; // User ID to delete
-  const requestingUserId = req.user.userId; // User ID of requesting user
+  const userIdToDelete = req.params.userId;
+  const requestingUserId = req.user.userId;
 
   try {
     if (requestingUserId !== userIdToDelete) {

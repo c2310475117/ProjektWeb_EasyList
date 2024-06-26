@@ -1,5 +1,3 @@
-// backend/server.js
-
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,7 +7,7 @@ import itemRoutes from './routes/itemRoutes.js';
 import medRoutes from './routes/medRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { controllerRoutes } from './routes/controllerRoutes.js';
-import { authMiddleware, checkListAccess } from './auth.js';
+import { authMiddleware } from './auth.js';
 import { syncDatabase } from './db.js';
 
 const app = express();
@@ -53,8 +51,8 @@ syncDatabase().then(() => {
 
   // Define additional routes
   app.use('/user', userRoutes);
-  app.use('/items', authMiddleware, itemRoutes);  // Removed checkListAccess here
-  app.use('/med', authMiddleware, medRoutes);    // Removed checkListAccess here
+  app.use('/items', authMiddleware, itemRoutes);
+  app.use('/meds', authMiddleware, medRoutes);
 
   // Test route to verify server is running
   app.get('/api/message', (req, res) => {
