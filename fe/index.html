@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login or Register</title>
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -60,6 +61,7 @@
       const password = event.target.Password.value;
 
       try {
+        console.log('Sending login request');
         const response = await fetch('http://localhost:3000/user/login', { 
           method: 'POST',
           headers: {
@@ -69,15 +71,18 @@
         });
 
         if (response.ok) {
+          console.log('Login successful');
           const data = await response.json(); 
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user_id);
           window.location.href = `todo.html?token=${data.token}&user_id=${data.user_id}`;
         } else {
           const errorText = await response.text();
+          console.error('Login failed:', errorText);
           alert('Login failed. Please check your credentials.');
         }
       } catch (error) {
+        console.error('Error during login:', error);
         alert('An error occurred. Please try again.');
       }
     });
@@ -89,6 +94,7 @@
       const password = event.target.Password.value;
 
       try {
+        console.log('Sending registration request');
         const response = await fetch('http://localhost:3000/user/register', { 
           method: 'POST',
           headers: {
@@ -98,15 +104,18 @@
         });
 
         if (response.ok) {
+          console.log('Registration successful');
           const data = await response.json(); 
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data.user_id);
           window.location.href = `todo.html?token=${data.token}&user_id=${data.user_id}`;
         } else {
           const errorText = await response.text();
+          console.error('Registration failed:', errorText);
           alert(`Registration failed: ${errorText}`);
         }
       } catch (error) {
+        console.error('Error during registration:', error);
         alert('An error occurred. Please try again.');
       }
     });

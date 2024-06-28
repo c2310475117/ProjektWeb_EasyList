@@ -1,3 +1,5 @@
+//!-- backend/models/listModel.js -->
+
 import { Model, DataTypes } from 'sequelize';
 import Sequ from '../db.js';
 import User from './userModel.js';
@@ -22,7 +24,7 @@ List.init({
         allowNull: false,
         references: {
             model: User,
-            key: 'user_id'
+            key: 'id' // korrekte Referenz zum Primärschlüssel des Usermodells
         }
     },
 
@@ -35,7 +37,7 @@ List.init({
     sequelize: Sequ,
     modelName: 'List',
     tableName: 'lists',
-    timestamps: true,
+    timestamps: true, // aktiviert die integrierten Felder createdAt und updatedAt
     underscored: true
 });
 
